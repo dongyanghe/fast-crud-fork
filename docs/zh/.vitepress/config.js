@@ -247,6 +247,17 @@ module.exports = {
                         },
                     ],
                 }
+            ],
+            '/source/': [
+                {
+                    text: "初始化",
+                    items: [
+                        {
+                            text: 'Init',
+                            link: '/source/init'
+                        }
+                    ]
+                }
             ]
         },
         author: 'Greper',
@@ -254,6 +265,7 @@ module.exports = {
             {text: '首页', link: '/'},
             {text: '指南', link: '/guide/'},
             {text: 'API', link: '/api/'},
+            {text: '源码', link: '/source/'},
             {text:"d.ts",link:"http://fast-crud.docmirror.cn/d.ts/modules.html"},
             {text: 'FsAdmin', link: '/admin/'},
             {text: '示例', link: '/demo/'},
