@@ -1,28 +1,28 @@
 import defaultCrudOptions from "./default-crud-options";
 import _ from "lodash-es";
 import { useMerge } from "./use-merge";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import logger from "../utils/util.log";
 import { uiContext } from "../ui";
 import { useI18n } from "../locale";
 import {
+  ColumnsFilterComponentProps,
   ComputeContext,
   CrudBinding,
   CrudExpose,
-  DoRemoveContext,
   DynamicallyCrudOptions,
   DynamicType,
-  ScopeContext
+  ScopeContext,
+  TableColumnsProps
 } from "../d";
 import { useCompute } from "./use-compute";
-import { useColumns } from "./use-columns";
+import { buildTableColumnsFlatMap, useColumns } from "./use-columns";
 import { CrudOptions } from "../d/crud";
-import { computed, Ref, ref } from "vue";
+import { Ref, ref } from "vue";
 import { useExpose } from "./use-expose";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const { merge, cloneDeep } = useMerge();
 
-export type UseCrudProps = {
+const { merge } = useMerge();
+
+export type UseCrudProps<T = UseFsContext> = {
   crudOptions: DynamicallyCrudOptions;
   /**
    * 即将废弃，请使用crudExpose
@@ -30,7 +30,7 @@ export type UseCrudProps = {
   expose?: CrudExpose;
   crudExpose: CrudExpose;
 
-  context: UseFsContext;
+  context: T;
   /**
    * 自定义参数
    * common里面可以使用
@@ -188,20 +188,23 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
       "onUpdate:compact"(value: any) {
         crudBinding.value.toolbar.compact = value;
       },
-      "onUpdate:columns"(value: any) {
+      "onUpdate:columns"(value: TableColumnsProps) {
         const original = crudBinding.value.table.columns;
-        const columns: Array<any> = [];
+        const columns: TableColumnsProps = {};
         _.forEach(value, (item) => {
-          for (const column of original) {
+          for (const key in original) {
+            const column = original[key];
             if (column.key === item.key) {
+              delete column.order;
               merge(column, item);
-              columns.push(column);
+              columns[key] = column;
               return;
             }
           }
         });
 
         crudBinding.value.table.columns = columns;
+        crudBinding.value.table.columnsMap = buildTableColumnsFlatMap({}, columns);
       },
       onRefresh() {
         doRefresh();
@@ -214,8 +217,9 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
       table: {
         onSortChange(sortChange: { isServerSort: boolean; prop: any; asc: any; order: any }) {
           const { isServerSort, prop, asc, order } = sortChange;
-          crudBinding.value.sort = isServerSort ? { prop, order, asc } : null;
-          if (isServerSort) {
+          const oldSort = crudBinding.value.table.sort;
+          crudBinding.value.table.sort = isServerSort ? { prop, order, asc } : null;
+          if (isServerSort || oldSort != null) {
             expose.doRefresh();
           }
         }
@@ -339,6 +343,7 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
     //初始化columns，将crudOptions.columns里面的配置转化为crudBinding
     return buildColumns(userOptions);
   }
+
   function resetCrudOptions(options: DynamicallyCrudOptions) {
     // 设置crudOptions Ref
     crudBinding.value = rebuildCrudBindings(options);
@@ -372,12 +377,12 @@ export type UseFsContext = {
   [key: string]: any;
 };
 
-export type CreateCrudOptionsProps = {
+export type CreateCrudOptionsProps<T = UseFsContext> = {
   crudExpose?: CrudExpose;
 
   expose?: CrudExpose;
 
-  context?: UseFsContext;
+  context?: T;
 };
 
 export type CreateCrudOptionsRet = {
@@ -391,26 +396,27 @@ export type CreateCrudOptionsRet = {
    */
   [key: string]: any;
 };
-export type UseFsProps = {
+export type UseFsProps<T = UseFsContext> = {
   crudRef?: Ref;
   crudBinding?: Ref<CrudBinding>;
 
   crudExposeRef?: Ref<CrudExpose>;
   createCrudOptions: CreateCrudOptions | CreateCrudOptionsAsync;
 
-  onExpose?: (context: OnExposeContext) => any;
+  onExpose?: (context: OnExposeContext<T>) => any;
 
-  context?: UseFsContext;
+  context?: T;
 };
 export type CreateCrudOptions = (props: CreateCrudOptionsProps) => CreateCrudOptionsRet;
-export type OnExposeContext = {
+export type OnExposeContext<T = UseFsContext> = {
   crudRef: Ref;
   crudBinding: Ref<CrudBinding>;
   crudExpose: CrudExpose;
-  context: UseFsContext;
+  context: T;
 };
 
 export type CreateCrudOptionsAsync = (props: CreateCrudOptionsProps) => Promise<CreateCrudOptionsRet>;
+
 function useFsImpl(props: UseFsProps): UseFsRet | Promise<UseCrudRet> {
   const { createCrudOptions, crudExposeRef } = props;
   const crudRef = props.crudRef || ref();

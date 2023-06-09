@@ -9,13 +9,14 @@ import {
   withDirectives
 } from "vue";
 import _ from "lodash-es";
-import { uiContext } from "../../ui";
+import { useUi } from "../../ui";
 import { useEditable } from "./editable/use-editable";
 import logger from "../../utils/util.log";
 import utilLog from "../../utils/util.log";
 import "./fs-table.less";
-import { ConditionalRenderProps, ColumnProps, ScopeContext, WriteableSlots } from "../../d";
+import { ColumnProps, ConditionalRenderProps, ScopeContext, TableColumnsProps, WriteableSlots } from "../../d";
 import { UiInterface } from "@fast-crud/ui-interface/src";
+import { Constants } from "../../utils/util.constants";
 
 type BuildTableColumnsOption = {
   props: any;
@@ -35,7 +36,7 @@ function buildTableSlots({ props, ui, renderRowHandle, renderCellComponent }: Bu
       const cellSlots: WriteableSlots = {};
       const cellSlotName = "cell_" + item.key;
       let currentTableColumnComp = tableColumnComp;
-      if (item.children && item.children.length > 0) {
+      if (item.children) {
         //subColumns
         cellSlots.default = () => {
           const subColumns: any[] = [];
@@ -110,21 +111,30 @@ function buildTableSlots({ props, ui, renderRowHandle, renderCellComponent }: Bu
 }
 
 /**
+ * 排序
+ * @param arr
+ */
+function doArraySort(arr: any) {
+  return _.sortBy(arr, (item) => {
+    return item.order ?? Constants.orderDefault;
+  });
+}
+
+/**
  * 通过config来渲染列
  * @param props
- * @param ctx
- * @param ui
- * @param getContextFn
  * @param componentRefs
  * @param renderRowHandle
  * @returns {*[]}
  */
-function buildTableColumns(options: any) {
-  const { props, ctx, ui, getContextFn, componentRefs, renderRowHandle, renderCellComponent } = options;
-  const originalColumns = options.columns ?? [];
-  const columns = [];
+function buildTableColumns(options: any): any[] {
+  const { props, renderRowHandle, renderCellComponent } = options;
+  const { ui } = useUi();
+  const originalColumns = options.columns ?? {};
+  let columns: ColumnProps[] = [];
 
-  for (const column of originalColumns) {
+  for (const key in originalColumns) {
+    const column = originalColumns[key];
     if (column.show === false) {
       continue;
     }
@@ -175,6 +185,7 @@ function buildTableColumns(options: any) {
     columns.push(rowHandle);
   }
 
+  columns = doArraySort(columns);
   utilLog.debug("table columns:", columns);
   return columns;
 }
@@ -190,23 +201,27 @@ export default defineComponent({
     /**
      * table插槽
      */
-    slots: {},
+    slots: {
+      type: Object as PropType<any>
+    },
     /**
      * 单元格插槽
      */
-    cellSlots: {},
+    cellSlots: {
+      type: Object as PropType<any>
+    },
     /**
      * 列配置，支持el-table-column|a-table-column配置
      */
     columns: {
-      type: Array,
+      type: Object as PropType<TableColumnsProps>,
       default: undefined
     },
     /**
      * 操作列
      */
     rowHandle: {
-      type: Object
+      type: Object as PropType<any>
     },
     /**
      * 是否显示表格
@@ -230,15 +245,23 @@ export default defineComponent({
      * 行编辑，批量编辑
      */
     editable: {
-      type: Object
+      type: Object as PropType<any>
     },
 
     loading: {
       type: Boolean,
       default: false
     },
-    request: {}
-  } as any,
+    /**
+     * 当前sort状态
+     */
+    sort: {
+      type: Object as PropType<any>
+    },
+    request: {
+      type: Object as PropType<any>
+    }
+  },
   emits: ["row-handle", "value-change", "pagination-change", "filter-change", "sort-change", "data-change"],
   setup(props, ctx) {
     const tableRef = ref();
@@ -261,7 +284,7 @@ export default defineComponent({
       }
     );
 
-    const ui = uiContext.get();
+    const { ui } = useUi();
     const tableComp = resolveDynamicComponent(ui.table.name);
     const tableColumnCI = ui.tableColumn;
 

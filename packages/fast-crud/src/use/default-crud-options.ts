@@ -10,7 +10,7 @@ export default {
     const ui = uiContext.get();
     return {
       mode: {},
-      data: [],
+      status: {},
       search: {
         container: {
           is: "fs-search-layout-default",
@@ -23,6 +23,9 @@ export default {
           ...ui.form.inlineLayout,
           // n-form 是否显示校验反馈
           showFeedback: false
+        },
+        onValidateError() {
+          ui.notification.error({ message: t("fs.search.error.message") });
         },
         collapse: true,
         show: true,
@@ -73,6 +76,7 @@ export default {
       rowHandle: {
         width: "250px",
         title: t("fs.rowHandle.title"),
+        order: 1000,
         dropdown: {
           // 操作列折叠
           more: {

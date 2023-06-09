@@ -278,6 +278,15 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
       }
       return {};
     },
+    getSearchValidatedFormData() {
+      if (!crudRef.value) {
+        return {};
+      }
+      if (crudRef.value.getSearchValidatedFormData) {
+        return crudRef.value.getSearchValidatedFormData();
+      }
+      return {};
+    },
     /**
      * {form,mergeForm}
      */
@@ -312,14 +321,14 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
         };
       }
 
-      const searchFormData = _.cloneDeep(crudExpose.getSearchFormData());
+      const searchFormData = _.cloneDeep(crudExpose.getSearchValidatedFormData());
       //配置searchValueResolve
       if (crudBinding.value?.search?.columns) {
         crudExpose.doValueResolve({ form: searchFormData }, toRaw(crudBinding.value.search.columns));
       }
       crudExpose.doValueResolve({ form: searchFormData });
 
-      const sort = crudBinding.value.sort || {};
+      const sort = crudBinding.value.table.sort || {};
       const query: PageQuery = { page, form: searchFormData, sort };
       let userPageQuery: UserPageQuery = query;
       if (crudBinding.value.request.transformQuery) {

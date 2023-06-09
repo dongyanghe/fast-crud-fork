@@ -1,8 +1,7 @@
-
-## table【表格配置】
-
+# crudOptions.table
+表格配置     
 更多参数见：[FsTable](/api/components/crud/crud/fs-table.md)
-支持 el-table | a-table的配置
+支持 el-table | a-table | n-table的配置
 
 ## show
 * 说明：显示或隐藏table
@@ -27,7 +26,7 @@
 
 ## columns
 * 说明：列配置
-* 类型：Array
+* 类型：<del>Array</del>  `TableColumnsProps`(v1.14改成map)
 
 ## loading
 * 说明：当前是否加载中

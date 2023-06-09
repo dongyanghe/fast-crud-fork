@@ -1,6 +1,6 @@
 {
   "name": "@fast-crud/ui-interface",
-  "version": "1.13.10",
+  "version": "1.14.0",
   "description": "interface",
   "main": "./src/index.ts",
   "module": "./src/index.ts",
@@ -50,7 +50,7 @@
     "vue-eslint-parser": "^9.1.0",
     "vue-tsc": "^1.2.0"
   },
-  "gitHead": "81f1790f3975940efa88b4b8eb435bda43ad1039",
+  "gitHead": "f47440dc3da2e618be14371fe41c0aa869987417",
   "dependencies": {
     "lodash-es": "^4.17.21"
   }
