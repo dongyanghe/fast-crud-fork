@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.14.5](https://github.com/fast-crud/fast-crud/compare/v1.14.4...v1.14.5) (2023-07-04)
+
+### Bug Fixes
+
+* 修复search.value第一次查询无效的bug ([d9a907a](https://github.com/fast-crud/fast-crud/commit/d9a907a477bae66662a8a8720a24ab3506772d30))
+
+## [1.14.4](https://github.com/fast-crud/fast-crud/compare/v1.14.3...v1.14.4) (2023-07-02)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-element
+
+## [1.14.3](https://github.com/fast-crud/fast-crud/compare/v1.14.2...v1.14.3) (2023-07-02)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-element
+
+## [1.14.2](https://github.com/fast-crud/fast-crud/compare/v1.14.1...v1.14.2) (2023-07-02)
+
+### Bug Fixes
+
+* 修复某些情况下fs-icon spin失效的bug ([2499a33](https://github.com/fast-crud/fast-crud/commit/2499a338def7436356c91a9b547e570c4204286d))
+
+### Performance Improvements
+
+* 导出重构 ([e99dc7b](https://github.com/fast-crud/fast-crud/commit/e99dc7bb6b24d4456fc524a04e8787e16b07511e))
+* export 功能 ([2accdba](https://github.com/fast-crud/fast-crud/commit/2accdba5d087c01a87c6fd20b98c6510d0038f9d))
+
 ## [1.14.1](https://github.com/fast-crud/fast-crud/compare/v1.14.0...v1.14.1) (2023-06-16)
 
 **Note:** Version bump only for package @fast-crud/fs-admin-element

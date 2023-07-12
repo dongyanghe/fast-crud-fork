@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.14.5](https://github.com/jekip/naive-ui-admin/compare/v1.14.4...v1.14.5) (2023-07-04)
+
+### Bug Fixes
+
+* 修复search.value第一次查询无效的bug ([d9a907a](https://github.com/jekip/naive-ui-admin/commit/d9a907a477bae66662a8a8720a24ab3506772d30))
+
+## [1.14.4](https://github.com/jekip/naive-ui-admin/compare/v1.14.3...v1.14.4) (2023-07-02)
+
+**Note:** Version bump only for package naive-ui-admin
+
+## [1.14.3](https://github.com/jekip/naive-ui-admin/compare/v1.14.2...v1.14.3) (2023-07-02)
+
+**Note:** Version bump only for package naive-ui-admin
+
+## [1.14.2](https://github.com/jekip/naive-ui-admin/compare/v1.14.1...v1.14.2) (2023-07-02)
+
+### Bug Fixes
+
+* 修复某些情况下fs-icon spin失效的bug ([2499a33](https://github.com/jekip/naive-ui-admin/commit/2499a338def7436356c91a9b547e570c4204286d))
+
 ## [1.14.1](https://github.com/jekip/naive-ui-admin/compare/v1.14.0...v1.14.1) (2023-06-16)
 
 **Note:** Version bump only for package naive-ui-admin

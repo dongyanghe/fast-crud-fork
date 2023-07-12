@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.14.5](https://github.com/fast-crud/fast-crud/compare/v1.14.4...v1.14.5) (2023-07-04)
+
+### Bug Fixes
+
+* 修复search.value第一次查询无效的bug ([d9a907a](https://github.com/fast-crud/fast-crud/commit/d9a907a477bae66662a8a8720a24ab3506772d30))
+* 修复toolbar search按钮高亮问题 ([a677d97](https://github.com/fast-crud/fast-crud/commit/a677d97a800308c47a14a5e22a4c23df53464417))
+
+### Performance Improvements
+
+* 优化export,支持查询导出 ([181828e](https://github.com/fast-crud/fast-crud/commit/181828e65159f2643c40957f24157701017f1013))
+
+## [1.14.4](https://github.com/fast-crud/fast-crud/compare/v1.14.3...v1.14.4) (2023-07-02)
+
+**Note:** Version bump only for package fast-crud-root
+
+## [1.14.3](https://github.com/fast-crud/fast-crud/compare/v1.14.2...v1.14.3) (2023-07-02)
+
+### Bug Fixes
+
+* export lib ([b93f554](https://github.com/fast-crud/fast-crud/commit/b93f554e1586cb923ea0795fa11dd317d1118b45))
+
+## [1.14.2](https://github.com/fast-crud/fast-crud/compare/v1.14.1...v1.14.2) (2023-07-02)
+
+### Bug Fixes
+
+* 修复多选导出csv，导致表格错位的bug ([4e0bf5b](https://github.com/fast-crud/fast-crud/commit/4e0bf5bae3bd39fd1654c5cf10991039eacf1acc))
+* 修复某些情况下fs-icon spin失效的bug ([2499a33](https://github.com/fast-crud/fast-crud/commit/2499a338def7436356c91a9b547e570c4204286d))
+* 修复行编辑模式下，render、conditionalRender无效的bug ([403fedc](https://github.com/fast-crud/fast-crud/commit/403fedc6e22817e33a1f4ac316a016e570127aa8))
+* search 意外执行valueResolve的bug ([b2ba83d](https://github.com/fast-crud/fast-crud/commit/b2ba83d7d93e9dc5b5684eca03a90a3991afeae0))
+
+### Performance Improvements
+
+* 导出支持dict ([dbb60bf](https://github.com/fast-crud/fast-crud/commit/dbb60bf10efb11d7ec10aa9687a19d92dd9891e1))
+* 导出重构 ([e99dc7b](https://github.com/fast-crud/fast-crud/commit/e99dc7bb6b24d4456fc524a04e8787e16b07511e))
+* 导入支持 ([5d81372](https://github.com/fast-crud/fast-crud/commit/5d8137297e38976b472094c8cb41f9bcf318f3b5))
+* 自定义组件支持触发validation ([ac15f11](https://github.com/fast-crud/fast-crud/commit/ac15f11b57ebcafb9a7dcd4846ae53b577e69b50))
+* currentPage 为空时报警告 ([fa25d08](https://github.com/fast-crud/fast-crud/commit/fa25d08d08f58ef86d75721e149216ec9a5faf03))
+* element-plus升级到2.3.7 ([0d51cb2](https://github.com/fast-crud/fast-crud/commit/0d51cb256e8c666cec26fe16ed0d5bba75b27529))
+* export 功能 ([7a06d06](https://github.com/fast-crud/fast-crud/commit/7a06d06786c14f1d16bf7b6fc02f461972ceeabc))
+* export 功能 ([2accdba](https://github.com/fast-crud/fast-crud/commit/2accdba5d087c01a87c6fd20b98c6510d0038f9d))
+* naiveui 自定义组件支持change validation ([9e8b75d](https://github.com/fast-crud/fast-crud/commit/9e8b75d3a0d640f86d66f9b78ac5ec57f687c339))
+* v-model editable-row示例 ([0304d51](https://github.com/fast-crud/fast-crud/commit/0304d517bb6552b23e33427c217910288a296218))
+
 ## [1.14.1](https://github.com/fast-crud/fast-crud/compare/v1.14.0...v1.14.1) (2023-06-16)
 
 ### Bug Fixes

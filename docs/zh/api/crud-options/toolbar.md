@@ -13,26 +13,70 @@
 * 说明：按钮配置
 * 类型：Object
 * 相关：[按钮组配置](../common-options.md#buttons)
-```json
-{ //crudOptions.toolbar.buttons
-    //查询按钮
-    search:{
-        ...FsButton,
-        order:1, 列排序号，数字越小越靠前排列。 默认值为1, 当配置0或负数则排到最前面，配置2则排到最后面
-        show:true,
-        click:()=>{} //点击事件，默认开启隐藏查询框
-    },
-    // 刷新按钮
-    refresh:{},
-    // 紧凑模式
-    compact:{},
-    // 导出按钮
-    export:{},
-    // 列设置按钮
-    columns:{}
-    //自定义button
+```js
+const crudOptions = {
+    toolbar:{
+        buttons:{
+            //查询按钮
+            search:{
+                ...FsButton,
+                circle:true,
+                order:1,  // 列排序号，数字越小越靠前排列。 默认值为1, 当配置0或负数则排到最前面，配置2则排到最后面
+                show:true,
+                click:()=>{} //点击事件，默认开启隐藏查询框
+            },
+            // 刷新按钮
+            refresh:{},
+            // 紧凑模式
+            compact:{},
+            // 导出按钮
+            export:{},
+            // 列设置按钮
+            columns:{},
+            //自定义button
+            customName:{}
+        }
+    }
 }
 ```
+
+
+
+## export
+* 说明：导出配置
+* 类型：`ExportProps`
+* 示例：
+
+```js
+const crudOptions = {
+    toolbar:{
+        buttons:{
+          export:{
+              show:true
+          }  
+        },
+        export:{
+            server:()=>Promise<void>, // 服务端导出方法，配置则开启服务端导出，本地导出则不生效
+            //以下为本地导出配置
+            columns:  null, // 导出的列配置，不配置则导出全部，类型为 {key:string,title:string}[],
+            noHeader: false, // 是否不需要表头
+            filename: 'table', // 导出文件名
+            fileType: 'csv' ,// 导出文件类型，可选值：csv | excel
+            merge: [], // excel 合并单元格配置,仅excel生效
+            dataFormatter: (opts:DataFormatterContext)=>{
+                //自定义修改导出数据
+                // DataFormatterContext = {row: any,originalRow: any, key: string, col: ColumnProps}
+                // row = 当前行数据
+                // originalRow = 当前行原始数据
+                // key = 当前列的key
+                // col = 当前列的配置
+            } ,
+        }
+    }
+}
+```
+
+
 ## compact
 * 说明：当前是否紧凑模式
 * 类型：Boolean

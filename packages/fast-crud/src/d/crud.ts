@@ -5,6 +5,7 @@ import { DoRemoveContext } from "../d/expose";
 
 import { RuleItem } from "async-validator";
 import { UiSlot, UiSlotRet } from "@fast-crud/ui-interface";
+import { ExportProps } from "../lib/fs-export";
 
 // export type FsRefValue<T> = T | Ref<T> | ComputedRef<T>;
 // export type FsComputeValue<T> = FsRefValue<T> | ComputeValue<T> | AsyncComputeValue<T>;
@@ -104,6 +105,20 @@ export type ValueChangeProps = {
  */
 export type ValueChangeHandle = (context: ValueChangeContext) => Promise<void>;
 
+export type Page = {
+  /**
+   * 当前页
+   */
+  currentPage?: number;
+  /**
+   * 每页条数
+   */
+  pageSize?: number;
+};
+/**
+ * 查询排序参数
+ */
+export type PageSort = { prop?: string; order?: string; asc?: boolean };
 /**
  * 查询
  */
@@ -111,7 +126,7 @@ export type PageQuery = {
   /**
    * 翻页参数
    */
-  page?: any;
+  page?: Page;
   /**
    * 查询表单
    */
@@ -119,7 +134,7 @@ export type PageQuery = {
   /**
    * 远程排序配置
    */
-  sort?: any;
+  sort?: PageSort;
 };
 
 /**
@@ -811,10 +826,17 @@ export type ToolbarComponentProps = {
    * 当前是否紧凑模式
    */
   compact?: boolean;
+
+  /**
+   * 导出配置
+   */
+  export?: ExportProps;
+
   /**
    * 列配置
    */
   columns?: TableColumnsProps;
+
   /**
    * 是否保存用户列设置
    * 传string则表示传入缓存的主key
@@ -1047,6 +1069,10 @@ export type ColumnProps = {
    */
   valueChange?: ValueChangeHandle | ValueChangeProps;
 
+  /**
+   * 是否支持导出
+   */
+  exportable?: boolean;
   /**
    * 其他x-table-column配置
    */

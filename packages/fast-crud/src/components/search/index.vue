@@ -174,7 +174,7 @@ export default defineComponent({
     function onFormValidated() {
       validateForm.value = _.cloneDeep(form);
     }
-    onFormValidated();
+
     const { doComputed, AsyncComputeValue } = useCompute();
 
     _.each(props.columns, (item) => {
@@ -505,6 +505,7 @@ export default defineComponent({
       return props.options.rules;
     });
 
+    onFormValidated();
     return {
       get,
       ui,
@@ -566,9 +567,10 @@ export default defineComponent({
         align-items: center;
       }
 
-      .el-form--inline {
-        display: flex;
-        align-items: center;
+      &.el-form--inline {
+        .el-input {
+          width: 100%;
+        }
       }
 
       .el-form-item__content {

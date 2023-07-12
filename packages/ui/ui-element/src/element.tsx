@@ -57,7 +57,7 @@ import {
 } from "@fast-crud/ui-interface";
 // @ts-ignore
 import _ from "lodash-es";
-import { ElDialog } from "element-plus";
+import { ElDialog, useFormItem } from "element-plus";
 
 export type ElementUiProvider = {
   Notification: any;
@@ -92,11 +92,7 @@ export class Element implements UiInterface {
   formWrapper: FormWrapperCI = creator<FormWrapperCI>({
     visible: "modelValue",
     customClass: (is: string) => {
-      if (is === "el-dialog") {
-        return "class";
-      } else {
-        return "customClass";
-      }
+      return "class";
     },
     titleSlotName: "header",
     buildOnClosedBind(is: string, onClosed: Function) {
@@ -204,7 +200,7 @@ export class Element implements UiInterface {
   dialog: DialogCI = creator<DialogCI>({
     name: "el-dialog",
     visible: "modelValue",
-    customClass: "customClass",
+    customClass: "class",
     buildOnClosedBind(onClosed) {
       return { onClosed };
     },
@@ -310,18 +306,6 @@ export class Element implements UiInterface {
       layout: "inline",
       inline: true
     },
-    // resetWrap: (formRef, { form, initialForm }) => {
-    //   // formRef.resetFields();
-    //   const entries = _.entries(form);
-    //   for (const entry of entries) {
-    //     const initialValue = _.get(initialForm, entry[0]);
-    //     if (initialValue == null) {
-    //       _.unset(form, entry[0]);
-    //     } else {
-    //       _.set(form, entry[0], initialValue);
-    //     }
-    //   }
-    // },
     validateWrap: async (formRef) => {
       return formRef.validate();
     },
@@ -343,7 +327,18 @@ export class Element implements UiInterface {
     name: "el-form-item",
     prop: "prop",
     label: "label",
-    rules: "rules"
+    rules: "rules",
+    injectFormItemContext() {
+      const { formItem } = useFormItem();
+      return {
+        async onChange() {
+          await formItem?.validate("change");
+        },
+        async onBlur() {
+          await formItem?.validate("blur");
+        }
+      };
+    }
   });
 
   button: ButtonCI = creator<ButtonCI>({

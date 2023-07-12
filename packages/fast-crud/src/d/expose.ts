@@ -1,5 +1,10 @@
-import { ColumnCompositionProps, CompositionColumns, CrudBinding, FormProps, RemoveProps } from "./crud";
+import { CompositionColumns, CrudBinding, FormProps, PageQuery, PageRes, RemoveProps } from "./crud";
 import { Ref } from "vue";
+import { EditableOnEnabledProps } from "../use";
+
+export type SearchOptions = {
+  silence?: boolean;
+};
 
 export type DoValueResolveProps = {
   form: any;
@@ -69,6 +74,12 @@ export type CrudExpose = {
    * @param opts {form, goFirstPage =true,mergeForm=false}
    */
   doSearch: (props: DoSearchProps) => Promise<void>;
+
+  /**
+   * 执行搜索，返回页面数据
+   * @param pageQuery
+   */
+  search: (pageQuery: PageQuery, options?: SearchOptions) => Promise<PageRes>;
   /**
    * 删除行按钮点击
    * @param context = {index / row}
@@ -183,9 +194,49 @@ export type CrudExpose = {
   /**
    * 行编辑
    */
-  editable: any;
+  editable: Editable;
 };
-
+export type EditableAddRowOptions = {
+  row?: any;
+  active?: boolean;
+};
+export type EditableEditColsOptions = {
+  cols: any[];
+};
+export type Editable = {
+  enable(opts: any, onEnabled?: (opts: EditableOnEnabledProps) => void): Promise<void>;
+  /**
+   * 禁用编辑
+   */
+  disable(): void;
+  /**
+   * 激活所有编辑
+   */
+  active(): void;
+  /**
+   * 退出编辑
+   */
+  inactive(): void;
+  /**
+   * 添加行
+   */
+  addRow(opts?: EditableAddRowOptions): void;
+  /**
+   * 编辑cols
+   * @param opts
+   */
+  editCol(opts: EditableEditColsOptions): void;
+  /**
+   * 还原，取消编辑
+   */
+  resume(): void;
+  removeRow(index: number): void;
+  getEditableRow(index: number): any;
+  doSaveRow(opts: { index: number }): Promise<void>;
+  doCancelRow(opts: { index: number }): Promise<void>;
+  doRemoveRow(opts: { index: number }): Promise<void>;
+  getInstance(): any;
+};
 /**
  * index or row 必须传一个
  */
