@@ -13,7 +13,7 @@
           <!-- 查询字段render，需要定义props.columns -->
           <template v-for="(item, key) of columns" :key="key">
             <component :is="ui.col.name" v-if="item.show" class="fs-search-col" v-bind="mergeCol(item.col)">
-              <fs-render :render-func="item._cellRender" />
+              <fs-render :render-func="item._cellRender" :scope="getContextFn()" />
             </component>
           </template>
           <span class="fs-search-col fs-search-slot">
@@ -27,8 +27,8 @@
           >
             <component :is="ui.formItem.name" :[ui.formItem.label]="action?.label">
               <!-- 查询按钮插槽-->
-              <slot name="search-buttons"></slot>
-              <slot name="search-right"></slot>
+              <slot name="search-buttons" v-bind="getContextFn()"></slot>
+              <slot name="search-right" v-bind="getContextFn()"></slot>
             </component>
           </component>
         </component>
@@ -96,6 +96,13 @@ export default defineComponent({
      */
     col: {
       type: Object
+    },
+
+    /**
+     * 获取查询上下文
+     */
+    getContextFn: {
+      type: Function
     }
   },
   emits: ["update:collapse", "collapse"],
@@ -178,6 +185,23 @@ export default defineComponent({
 
           &:first-child {
             // margin-left: 0;
+          }
+
+          .ant-input-number,
+          .ant-picker,
+          .el-input-number,
+          .el-cascader,
+          .el-date-editor,
+          .n-select,
+          .n-date-picker,
+          .n-input-number {
+            width: 100%;
+          }
+          .el-date-editor .el-range__icon {
+            margin-left: 10px;
+          }
+          .el-date-editor .el-range__close-icon {
+            margin-right: 10px;
           }
         }
       }

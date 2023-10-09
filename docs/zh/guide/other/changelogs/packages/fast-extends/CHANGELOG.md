@@ -3,6 +3,118 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.17.5](https://github.com/fast-crud/fast-crud/compare/v1.17.4...v1.17.5) (2023-09-26)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+## [1.17.4](https://github.com/fast-crud/fast-crud/compare/v1.17.3...v1.17.4) (2023-09-26)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+## [1.17.3](https://github.com/fast-crud/fast-crud/compare/v1.17.2...v1.17.3) (2023-09-23)
+
+### Bug Fixes
+
+* upload输入值支持int boolean等类型 ([60c641f](https://github.com/fast-crud/fast-crud/commit/60c641f3bc6e69608e173d98c800105d47862476))
+
+### Performance Improvements
+
+* fs-files-format 支持自定义getFileName ([994f3af](https://github.com/fast-crud/fast-crud/commit/994f3aff0fe749b8165de3891542b0c53f1dcd57))
+* fs-files-uploader支持自定义getFileName ([1a6a3e4](https://github.com/fast-crud/fast-crud/commit/1a6a3e4ba180ea93ab5aaa08a2315528c52fa617))
+
+## [1.17.2](https://github.com/fast-crud/fast-crud/compare/v1.17.1...v1.17.2) (2023-09-16)
+
+### Bug Fixes
+
+* 修复富文本编辑器图片上传报错的bug ([fa18d93](https://github.com/fast-crud/fast-crud/commit/fa18d93980d358382e191480a7e20ddf3d59fe63))
+* 修复naive 最后一个文件无法删除的bug ([49c0e6f](https://github.com/fast-crud/fast-crud/commit/49c0e6f869b2587e19368ddd8915656f48e04009))
+* antdv 查询框label上置错位的bug ([7545586](https://github.com/fast-crud/fast-crud/commit/7545586472eeddeca98d7097534b658403049996))
+
+## [1.17.1](https://github.com/fast-crud/fast-crud/compare/v1.17.0...v1.17.1) (2023-09-13)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+# [1.17.0](https://github.com/fast-crud/fast-crud/compare/v1.16.11...v1.17.0) (2023-09-12)
+
+### Bug Fixes
+
+* 修复element 图片裁剪组件无法横向排列的bug ([25fa258](https://github.com/fast-crud/fast-crud/commit/25fa25855e9750813d5a959a8b09ff6e90b04c1c))
+
+## [1.16.11](https://github.com/fast-crud/fast-crud/compare/v1.16.10...v1.16.11) (2023-09-03)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+## [1.16.10](https://github.com/fast-crud/fast-crud/compare/v1.16.9...v1.16.10) (2023-09-03)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+## [1.16.9](https://github.com/fast-crud/fast-crud/compare/v1.16.8...v1.16.9) (2023-09-03)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+## [1.16.8](https://github.com/fast-crud/fast-crud/compare/v1.16.7...v1.16.8) (2023-09-03)
+
+### Performance Improvements
+
+* 文件上传优化，导出上传方法 ([9f3c821](https://github.com/fast-crud/fast-crud/commit/9f3c8214cda27cf6411ecad7d0729b23afdcaf4e))
+* 组件独立使用示例 ([ace357c](https://github.com/fast-crud/fast-crud/commit/ace357c152d6a30d5b8fbebf885db53e26a02ae6))
+
+## [1.16.7](https://github.com/fast-crud/fast-crud/compare/v1.16.6...v1.16.7) (2023-08-21)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+## [1.16.6](https://github.com/fast-crud/fast-crud/compare/v1.16.5...v1.16.6) (2023-08-21)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+## [1.16.5](https://github.com/fast-crud/fast-crud/compare/v1.16.4...v1.16.5) (2023-08-20)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+## [1.16.4](https://github.com/fast-crud/fast-crud/compare/v1.16.3...v1.16.4) (2023-08-18)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+## [1.16.3](https://github.com/fast-crud/fast-crud/compare/v1.16.2...v1.16.3) (2023-08-18)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+## [1.16.2](https://github.com/fast-crud/fast-crud/compare/v1.16.1...v1.16.2) (2023-08-10)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+## [1.16.1](https://github.com/fast-crud/fast-crud/compare/v1.16.0...v1.16.1) (2023-08-09)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+# [1.16.0](https://github.com/fast-crud/fast-crud/compare/v1.15.1...v1.16.0) (2023-08-07)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+## [1.15.1](https://github.com/fast-crud/fast-crud/compare/v1.15.0...v1.15.1) (2023-08-05)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+# [1.15.0](https://github.com/fast-crud/fast-crud/compare/v1.14.7...v1.15.0) (2023-08-05)
+
+### Features
+
+* antdv4 支持 ([1935614](https://github.com/fast-crud/fast-crud/commit/19356142cda925d1248fe7c84c18cb8324ce5f70))
+
+### Performance Improvements
+
+* 升级依赖版本 ([1007384](https://github.com/fast-crud/fast-crud/commit/1007384e5e45f504b2106554c5411a3c50745ec6))
+
+## [1.14.7](https://github.com/fast-crud/fast-crud/compare/v1.14.6...v1.14.7) (2023-07-24)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+## [1.14.6](https://github.com/fast-crud/fast-crud/compare/v1.14.5...v1.14.6) (2023-07-23)
+
+### Bug Fixes
+
+* 修复图片value值为object时报错的bug ([157da86](https://github.com/fast-crud/fast-crud/commit/157da86cb9623357554de6a415a13aeaefe510bc))
+
 ## [1.14.5](https://github.com/fast-crud/fast-crud/compare/v1.14.4...v1.14.5) (2023-07-04)
 
 **Note:** Version bump only for package @fast-crud/fast-extends

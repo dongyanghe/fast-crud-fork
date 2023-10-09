@@ -84,9 +84,10 @@ async function build(){
 const naive = "http://flow-openapi.aliyun.com/pipeline/webhook/Zm3TJyDtyFZgV4dtJiD1"
 const doc = "http://flow-openapi.aliyun.com/pipeline/webhook/soOYdQ5sF3kLjTPJGmIO"
 const antdv = "http://flow-openapi.aliyun.com/pipeline/webhook/HiL0uVYxfUnBzIMJZVXB"
+const antdv4 = "http://flow-openapi.aliyun.com/pipeline/webhook/U6zdIwkJ56xWZvctCOkE"
 const element = "http://flow-openapi.aliyun.com/pipeline/webhook/uFTI0XJ9RgqnofX7jpRD"
 
-const webhooks = [doc,naive,antdv,element]
+const webhooks = [doc,naive,antdv,antdv4,element]
 
 async function sleep(time){
     return new Promise(resolve => {
@@ -125,9 +126,7 @@ start()
 
 /**
  * 打包前 修改 lerna
- * nodemodules里面搜索如下
- * return childProcess.exec("git", ["add", "--", ...files], execOpts);
- *
+ * nodemodules @lerna-lite里面搜索如下
  * ('git', ['add', '--', ...files]
- * ('git', ['add', '.']
+ * 改成 ('git', ['add', '.']
  */

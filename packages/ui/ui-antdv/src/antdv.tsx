@@ -48,6 +48,7 @@ import {
   SwitchCI,
   TableCI,
   TableColumnCI,
+  TableScrollReq,
   TabPaneCI,
   TabsCI,
   TagCI,
@@ -247,6 +248,8 @@ export class Antdv implements UiInterface {
     modelValue: "visible",
     visible: "visible",
     customClass: "wrapClassName",
+    titleSlotName: "title",
+    footerSlotName: "footer",
     footer(footer: any = null) {
       return { footer };
     },
@@ -261,6 +264,10 @@ export class Antdv implements UiInterface {
     },
     builder(opts) {
       return buildBinding(this, opts, {
+        props: {
+          title: opts.title,
+          width: opts.width
+        },
         slots: {
           footer: opts.footer
         }
@@ -379,6 +386,7 @@ export class Antdv implements UiInterface {
     prop: "name",
     label: "label",
     rules: "rules",
+    skipValidationWrapper: "a-form-item-rest",
     injectFormItemContext() {
       const formItemContext = Form.useInjectFormItemContext();
       return {
@@ -450,6 +458,11 @@ export class Antdv implements UiInterface {
     name: "a-select",
     modelValue: "value",
     clearable: "allowClear",
+    buildMultiBinding(multiple: boolean) {
+      return {
+        mode: multiple ? "multiple" : ""
+      };
+    },
     builder(opts) {
       return buildBinding(this, opts, {
         props: {
@@ -489,6 +502,34 @@ export class Antdv implements UiInterface {
     fixedHeaderNeedComputeBodyHeight: true,
     headerDomSelector: ".ant-table-thead",
     vLoading: false,
+    buildSelectionBinding(req) {
+      const selectedRowKeys = req.selectedRowKeys;
+      const onChange = (changed: any[]) => {
+        req.onSelectedKeysChanged(changed);
+      };
+      let type = "radio";
+      if (req.multiple === true) {
+        type = "checkbox";
+      }
+      return {
+        rowSelection: {
+          type,
+          selectedRowKeys,
+          onChange,
+          preserveSelectedRowKeys: req.crossPage
+        }
+      };
+    },
+    scrollTo(req: TableScrollReq) {
+      try {
+        const body = req.fsTableRef.vnode.el.querySelector(".ant-table-body");
+        if (body) {
+          body.scrollTop = req.top;
+        }
+      } catch (e) {
+        console.error("scroll to top error:", e);
+      }
+    },
     onChange({ onSortChange, onFilterChange, onPagination, bubbleUp }) {
       return {
         onChange: (pagination: any, filters: any, sorter: any, ctx: any) => {

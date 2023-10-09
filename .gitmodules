@@ -7,3 +7,6 @@
 [submodule "packages/fast-admin/fs-admin-naive-ui"]
 	path = packages/fast-admin/fs-admin-naive-ui
 	url = https://github.com/fast-crud/fs-admin-naive-ui
+[submodule "packages/fast-admin/fs-admin-antdv4"]
+	path = packages/fast-admin/fs-admin-antdv4
+	url = https://github.com/fast-crud/fs-admin-antdv4

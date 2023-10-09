@@ -187,8 +187,6 @@ export default defineComponent({
       try {
         await formRef.value.submit();
         close();
-      } catch (e) {
-        console.warn("submit error", e);
       } finally {
         loading.value = false;
       }
@@ -394,7 +392,7 @@ export default defineComponent({
       };
 
       const vStyle = {
-        zIndex: props.zIndex
+        zIndex: formWrapperBind.value.zIndex || props.zIndex
       };
 
       const formWrapperComp = resolveDynamicComponent(is);

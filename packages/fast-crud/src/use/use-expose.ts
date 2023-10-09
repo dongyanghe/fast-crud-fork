@@ -1,4 +1,4 @@
-import { Ref, toRaw } from "vue";
+import { nextTick, Ref, toRaw } from "vue";
 import {
   CrudExpose,
   Editable,
@@ -8,7 +8,7 @@ import {
   OpenEditContext,
   SetFormDataOptions
 } from "../d/expose";
-import _ from "lodash-es";
+import _, { isArray } from "lodash-es";
 import logger from "../utils/util.log";
 import { useMerge } from "../use/use-merge";
 import { useUi } from "../use/use-ui";
@@ -143,31 +143,23 @@ function useEditable(props: UseEditableProps) {
       editableRow.inactive();
     },
     async doRemoveRow(opts: { index: number }) {
-      const { index } = opts;
-      try {
-        await ui.messageBox.confirm({
-          title: t("fs.rowHandle.remove.confirmTitle"), // '提示',
-          message: t("fs.rowHandle.remove.confirmMessage"), // '确定要删除此记录吗?',
-          type: "warn"
-        });
-      } catch (e) {
-        // @ts-ignore
-        logger.info("delete canceled", e.message);
-        return;
-      }
+      const index = opts.index;
       const row = editable.getEditableRow(index);
-      if (row.isAdd) {
-        editable.removeRow(index);
-      } else {
-        if (crudBinding.value.mode.name === "local") {
-          // do nothing
-        } else {
-          const rowData = row.getRowData(index);
-          await crudBinding.value.request.delRequest({ row: rowData });
-          crudExpose.doRefresh();
+      const rowData = row.getRowData(index);
+      const context = { index, row: rowData };
+      await crudExpose.doRemove(context, {
+        async handle() {
+          if (row.isAdd) {
+            editable.removeRow(index);
+          } else {
+            if (crudBinding.value.mode.name === "local") {
+              editable.removeRow(index);
+            } else {
+              await crudBinding.value.request.delRequest({ row: rowData });
+            }
+          }
         }
-      }
-      ui.notification.success(t("fs.rowHandle.remove.success"));
+      });
     },
     getInstance() {
       crudExpose.getTableRef().editable;
@@ -249,6 +241,11 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
             column: col
           });
         });
+
+        //children
+        if (row.children && isArray(row.children)) {
+          crudExpose.doValueBuilder(row.children, columns);
+        }
       });
       logger.debug("valueBuilder success:", records);
     },
@@ -278,30 +275,20 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
       });
       logger.debug("valueResolve success:", form);
     },
+    doSearchValidate() {
+      crudExpose.getSearchRef().doValidate();
+    },
     getSearchFormData() {
-      if (!crudRef.value) {
-        return {};
-      }
-      if (crudRef.value.getSearchFormData) {
-        return crudRef.value.getSearchFormData();
-      }
-      return {};
+      return crudBinding.value.search.validatedForm;
     },
     getSearchValidatedFormData() {
-      if (!crudRef.value) {
-        return {};
-      }
-      if (crudRef.value.getSearchValidatedFormData) {
-        return crudRef.value.getSearchValidatedFormData();
-      }
-      return {};
+      return crudBinding.value.search.validatedForm;
     },
     /**
      * {form,mergeForm}
      */
     setSearchFormData(context) {
-      checkCrudRef();
-      crudRef.value.setSearchFormData(context);
+      _.merge(crudBinding.value.search.validatedForm, context.form);
       if (context.triggerSearch) {
         crudExpose.doRefresh();
       }
@@ -311,7 +298,7 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
      */
     getSearchRef() {
       checkCrudRef();
-      return crudRef.value.getSearchRef();
+      return crudRef.value?.getSearchRef();
     },
 
     async search(pageQuery: PageQuery, options: SearchOptions = {}) {
@@ -384,7 +371,7 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
           pageSize: crudBinding.value.pagination.pageSize
         };
       }
-      const pageRes = await crudExpose.search({ page });
+      const pageRes = await crudExpose.search({ page }, { silence: props?.silence });
       const { currentPage = page[ui.pagination.currentPage], pageSize = page.pageSize, total } = pageRes;
       const { records } = pageRes;
       if (
@@ -403,7 +390,6 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
         );
         return;
       }
-
       crudBinding.value.data = records;
       if (crudBinding.value.pagination) {
         crudBinding.value.pagination[ui.pagination.currentPage] = currentPage;
@@ -465,6 +451,7 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
       }
       if (opts.form && crudRef.value) {
         crudRef.value.setSearchFormData(opts);
+        crudExpose.setSearchFormData({ form: opts.form, mergeForm: opts.mergeForm, refWarning: false });
       }
 
       await crudExpose.doRefresh();
@@ -485,7 +472,7 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
         logger.warn("fs-table还未挂载");
         return;
       }
-      return tableRef.value.tableRef;
+      return tableRef.tableRef;
     },
     /**
      * 获取表格数据
@@ -556,18 +543,25 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
         return;
       }
       let res = null;
-      if (crudBinding.value.mode?.name === "local") {
-        crudExpose.removeTableRow(context?.index);
+      const isLocal = crudBinding.value.mode?.name === "local";
+      if (opts?.handler) {
+        await opts.handler(context);
       } else {
-        res = await crudBinding.value.request.delRequest(context);
+        if (isLocal) {
+          crudExpose.removeTableRow(context?.index);
+        } else {
+          res = await crudBinding.value.request.delRequest(context);
+        }
       }
 
       if (removeBinding.showSuccessNotification !== false) {
         ui.notification.success(t("fs.rowHandle.remove.success"));
       }
 
-      if (removeBinding.refreshTable !== false) {
-        await crudExpose.doRefresh();
+      if (!isLocal) {
+        if (removeBinding.refreshTable !== false) {
+          await crudExpose.doRefresh();
+        }
       }
 
       if (removeBinding.onRemoved) {
@@ -592,6 +586,7 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
       const { merge } = useMerge();
       // @ts-ignore
       let row = context.row || context[ui.tableColumn.row];
+      delete context.row;
       if (row == null && context.index != null) {
         row = crudExpose.getTableDataRow(context.index);
       }
@@ -599,11 +594,10 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
         row = await crudBinding.value.request.infoRequest({ mode, row });
       }
       const options = {
-        mode,
-        initialForm: row
+        mode
       };
       const xxForm = toRaw(crudBinding.value[mode + "Form"]);
-      merge(options, xxForm, context, formOpts);
+      merge(options, xxForm, { initialForm: row }, context, formOpts);
       return await this.openDialog(options);
     },
     async openAdd(context: OpenEditContext, formOpts: OpenDialogProps = {}) {

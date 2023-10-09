@@ -8,6 +8,10 @@ const crudOptions = {
         key:{ //字段key
             title: '字段名',
             type: 'text'
+        },
+        'user.name':{ //数据支持多级结构 row={key:xx,user:{name:xxx}}
+            title: '用户名称',
+            type: 'text'
         }
     }
 }
@@ -103,10 +107,13 @@ const crudOptions = {
 * 示例：
 ```js
 crudOptions = { //
-    form: {
-        valueChange(context){
-            console.log('value:',context.value, " row:",context.row)
-        },
+    columns:{
+        key:{
+            column:{
+                valueChange(context){
+                    console.log('value:',context.value, " row:",context.row)
+                }
+            }
     }
 }
 ```
@@ -440,17 +447,21 @@ const crudOptions = {
 * 示例：
 ```js
 crudOptions = { //
-  form: {
-    valueChange(context){
-      console.log(context)
-    },
-      // 或者
-    valueChange:{
-        immediate:true, //是否立即执行一次
-        handle(context){
-        //值变化后的处理
-        }
-    }
+  columns:{
+      key:{
+          form: {
+              valueChange(context){
+                  console.log(context)
+              },
+              // 或者
+              valueChange:{
+                  immediate:true, //是否立即执行一次
+                  handle(context){
+                      //值变化后的处理
+                  }
+              }
+          }
+      }
   }
 }
 ```
@@ -534,7 +545,7 @@ const crudOptions ={
 
 
 ## [key].search.col
-* 说明：col配置，el-col,a-col,n-col的配置
+* 说明：查询字段的单独col配置，设置查询字段宽度，支持el-col,a-col,n-col的配置
 * 类型：Object
 * 示例：
 ```js
@@ -543,11 +554,29 @@ const crudOptions = {
         key:{
             search:{
                 col:{span:4} //占据一行的4格
+                //像时间范围查询这种，可以配置为{span:8}，占据一行的8格，就可以实现规整的查询框布局
             }
         }
     }
 }
 ```
+
+## [key].search.autoSearchTrigger
+* 说明：是否在该字段变化时触发自动查询，需要总的autoSearch开启状态才会生效
+* 类型： boolean | 'input' 输入触发 | 'change' 变化时触发 | 'enter'  回车键触发
+* 示例：
+```js
+const crudOptions = {
+    columns:{
+        key:{
+            search:{
+                autoSearchTrigger: true  // change | enter | input
+            }
+        }
+    }
+}
+```
+
 
 ## [key].search.valueChange
 * 说明: 值变化触发
@@ -555,10 +584,14 @@ const crudOptions = {
 * 示例：
 ```js
 crudOptions = { //
-  form: {
-    valueChange(context){
-      console.log(context)
-    },
+  columns:{
+      key:{
+          search:{
+              valueChange(context){
+                  console.log(context)
+              },
+          }
+      }
   }
 }
 ```

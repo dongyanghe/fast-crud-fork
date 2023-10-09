@@ -53,11 +53,13 @@ import {
   ButtonGroupCI,
   ColCI,
   RowCI,
-  CardCI
+  CardCI,
+  TableScrollReq
 } from "@fast-crud/ui-interface";
 // @ts-ignore
-import _ from "lodash-es";
+import _, { isFunction } from "lodash-es";
 import { ElDialog, useFormItem } from "element-plus";
+import { ref } from "vue";
 
 export type ElementUiProvider = {
   Notification: any;
@@ -201,6 +203,8 @@ export class Element implements UiInterface {
     name: "el-dialog",
     visible: "modelValue",
     customClass: "class",
+    titleSlotName: "header",
+    footerSlotName: "footer",
     buildOnClosedBind(onClosed) {
       return { onClosed };
     },
@@ -209,6 +213,17 @@ export class Element implements UiInterface {
     },
     open(opts) {
       ElDialog.open(opts);
+    },
+    builder(opts) {
+      return buildBinding(this, opts, {
+        props: {
+          title: opts.title,
+          width: opts.width
+        },
+        slots: {
+          footer: opts.footer
+        }
+      });
     }
   });
 
@@ -266,7 +281,10 @@ export class Element implements UiInterface {
   select: SelectCI = creator<SelectCI>({
     name: "el-select",
     modelValue: "modelValue",
-    clearable: "clearable"
+    clearable: "clearable",
+    buildMultiBinding(multiple) {
+      return { multiple };
+    }
   });
 
   treeSelect: TreeSelectCI = creator<TreeSelectCI>({
@@ -328,6 +346,7 @@ export class Element implements UiInterface {
     prop: "prop",
     label: "label",
     rules: "rules",
+    skipValidationWrapper: "div",
     injectFormItemContext() {
       const { formItem } = useFormItem();
       return {
@@ -401,8 +420,90 @@ export class Element implements UiInterface {
     },
     headerDomSelector: "",
     vLoading: "loading",
+    // 没太大用
+    setSelectedRows({ multiple, selectedRowKeys, tableRef, getRowKey }) {
+      const rowKey: any = getRowKey();
+      const curSelectedRows = [];
+      for (const key of selectedRowKeys.value) {
+        for (const row of tableRef.data) {
+          if (row[rowKey] === key) {
+            curSelectedRows.push(row);
+          }
+        }
+      }
+      if (multiple) {
+        for (const row of curSelectedRows) {
+          tableRef.toggleRowSelection(row, true);
+        }
+      } else {
+        if (selectedRowKeys.value.length > 0) {
+          tableRef.setCurrentRow(curSelectedRows[0]);
+        }
+      }
+    },
+    buildSelectionBinding(req) {
+      function getCrossPageSelected(curSelectedIds: any[]) {
+        const rowKey: any = req.getRowKey();
+        const data = req.getPageData();
+        let mapId = rowKey;
+        if (!isFunction(rowKey)) {
+          mapId = (item: any) => {
+            return item[rowKey];
+          };
+        }
+        const currentIds = data.map(mapId);
+        //已选中数据中，排除掉本页数据
+        const otherPageSelected = req.selectedRowKeys.value.filter((item: any) => !currentIds.includes(item));
+        return _.union(otherPageSelected, curSelectedIds);
+      }
+
+      if (req.multiple) {
+        const onSelectionChange = (changedRows: any[]) => {
+          const rowKey = req.getRowKey();
+          let selectedKeys = changedRows.map((item: any) => item[rowKey]);
+          if (req.crossPage) {
+            selectedKeys = getCrossPageSelected(selectedKeys);
+          }
+          req.onSelectedKeysChanged(selectedKeys);
+        };
+        return {
+          table: {
+            onSelectionChange
+          },
+          columns: {
+            $checked: {
+              form: { show: false },
+              column: {
+                type: "selection",
+                align: "center",
+                width: "55px",
+                order: -9999,
+                reserveSelection: req.crossPage,
+                columnSetDisabled: true //禁止在列设置中选择
+              }
+            }
+          }
+        };
+      } else {
+        //单选
+        const onCurrentChange = (changed: any) => {
+          const rowKey = req.getRowKey();
+          const selectedKeys = [changed[rowKey]];
+          req.onSelectedKeysChanged(selectedKeys);
+        };
+        return {
+          table: {
+            highlightCurrentRow: true,
+            onCurrentChange: onCurrentChange
+          }
+        };
+      }
+    },
     rebuildRenderScope: (scope) => {
       return scope;
+    },
+    scrollTo(req: TableScrollReq) {
+      req.tableRef?.value?.setScrollTop(req.top);
     },
     onChange({ onSortChange, onFilterChange, bubbleUp }) {
       return {

@@ -100,10 +100,12 @@ const crudOptions= {
 
 
 ## 谁在用fast-crud？
-* [battcn/wemirr-platform](https://gitee.com/battcn/wemirr-platform) ：中台管理系统 [预览地址](https://cloud.battcn.com/) , [配套前端ui](https://gitee.com/battcn/wemirr-platform-ui)
-* [django-vue3-admin](https://gitee.com/huge-dream/django-vue3-admin)
+* [battcn/wemirr-platform](https://gitee.com/battcn/wemirr-platform) ：中台管理系统，java做后台 [预览地址](https://cloud.battcn.com/) , [配套前端ui](https://gitee.com/battcn/wemirr-platform-ui)
+* [django-vue3-admin](https://gitee.com/huge-dream/django-vue3-admin) ：基于python ，django的后台管理系统
 * 极兔速递，内部使用
 
+好评如潮，你还不试试？     
+![](images/good.png)
 
 ## 联系作者
 
@@ -175,10 +177,20 @@ QQ群
 
 ## 我的其他项目
 
-* [袖手GPT](https://ai.handsfree.work/) ：ChatGPT，国内可用，无需FQ，每日免费额度
-* [certd](https://github.com/certd/certd/) ：免费通配符域名证书全自动申请部署工具
-* [dev-sidecar](https://github.com/docmirror/dev-sidecar) ：直连访问github工具，无需FQ，解决github无法访问的问题
+| logo                                                                                         |项目| 简介                       |
+|----------------------------------------------------------------------------------------------|---|--------------------------|
+| <img src="https://ai.handsfree.work/logo.png" width='50px'/>                                 | [袖手GPT](https://ai.handsfree.work/)  | ChatGPT，国内可用，无需FQ，每日免费额度 |
+| <img src="http://certd.handsfree.work/images/logo/rect-black.svg" width="100px">             | [certd](https://github.com/certd/certd/)   | 免费通配符域名证书全自动申请部署工具 |
+| <img src="https://github.com/docmirror/dev-sidecar/raw/master/doc/index.png" width="100px"/> | [dev-sidecar](https://github.com/docmirror/dev-sidecar) |直连访问github工具，无需FQ，解决github无法访问的问题 |
+
+
 > ---------------来都来了点个star再走呗-----------------↗↗↗↗↗↗↗↗  
-> 解谜提示  
+> DevSidecar解谜提示  
 > 谜题共三层，前两层是两种不同的编码方式，第三层这里就不剧透了，留一点小乐趣。
-* 
+
+
+
+
+## 感谢支持
+* [jetbrains](https://jb.gg/OpenSourceSupport) ：感谢jetbrains提供的免费开源license    
+![](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg)

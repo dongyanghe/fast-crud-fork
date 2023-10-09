@@ -46,7 +46,7 @@ export function useDict(props: any, ctx: any, vModel = "modelValue") {
   const getScope: Function = inject("get:scope", function () {});
 
   function getCurrentScope() {
-    const value = props[vModel];
+    const value = props[vModel] || ctx.attrs[vModel];
     return {
       ...getScope(),
       componentRef: proxy,
@@ -59,6 +59,20 @@ export function useDict(props: any, ctx: any, vModel = "modelValue") {
     if (!dict) {
       return;
     }
+
+    if (dict.getNodesByValues) {
+      const scope = getCurrentScope();
+      if (scope.value == null) {
+        return;
+      }
+      let values = scope.value;
+      if (!Array.isArray(scope.value)) {
+        values = [scope.value];
+      }
+      await dict.appendByValues(values);
+      return;
+    }
+
     if (dict.loading) {
       return;
     }
@@ -146,7 +160,14 @@ export function useDict(props: any, ctx: any, vModel = "modelValue") {
     return getPropValue(item, "children");
   };
   const getLabel = (item: any) => {
-    return getPropValue(item, "label");
+    if (props.labelFormatter) {
+      return props.labelFormatter(item);
+    }
+    const label = getPropValue(item, "label");
+    if (label == null) {
+      return "";
+    }
+    return String(label);
   };
   const getColor = (item: any) => {
     return getPropValue(item, "color");

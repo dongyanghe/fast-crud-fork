@@ -24,8 +24,10 @@ export default {
           // n-form 是否显示校验反馈
           showFeedback: false
         },
-        onValidateError() {
-          ui.notification.error({ message: t("fs.search.error.message") });
+        onValidateError({ trigger }: any) {
+          if (trigger === "search") {
+            ui.notification.error({ message: t("fs.search.error.message") });
+          }
         },
         collapse: true,
         show: true,
@@ -44,6 +46,9 @@ export default {
         labelWidth: "80px", //element
         style: {
           "grid-template-columns": "50% 50%" // grid布局，默认两列
+        },
+        row: {
+          gutter: 10
         },
         col: { span: 12 },
         labelAlign: "right", // antdv

@@ -6,7 +6,7 @@
 以下为各ui的官方示例，里面包含丰富的crud特性配置示例
 
 ### 1. antdv
-[antdv示例地址](http://fast-crud.docmirror.cn/antdv/)
+[antdv示例地址](http://fast-crud.docmirror.cn/antdv/)  /  [antdv4示例地址](http://fast-crud.docmirror.cn/antdv4/)
 
 ### 2. element-plus
 [element示例地址](http://fast-crud.docmirror.cn/element/)
@@ -14,8 +14,33 @@
 ### 3. naive
 [NaiveUI示例地址](http://fast-crud.docmirror.cn/naive/)
 
+## 二、集成示例
 
-## 二、admin脚手架starter
+### 1. certd
+* 简介：证书自动化申请和续期，让你的证书永不过期
+* 技术：`js server, midwayjs` + `fast-crud`
+* 开源地址: [certd 证书自动化](https://github.com/certd/certd) : 
+* 预览地址：[在线预览](https://certd.handsfree.work/)   
+
+### 2. fs-bpmn
+* 简介：工作流流程设计器
+* 开源地址： [fs-bpmn 流程设计器](https://github.com/fast-crud/fs-bpmn-demo/)
+* 预览地址： [在线预览](http://fast-crud.docmirror.cn/bpmn/)
+
+### 3. embeddings-store
+* 简介： 向量仓库，嵌入向量存储和检索
+* 技术： `python server ，fastapi`  + `fast-crud`
+* 开源地址：[embeddings-store](https://github.com/handsfree/embeddings-store/) 
+
+### 4. dvadmin
+* 简介：基于python，django的后台管理系统框架，fast-crud做client
+* 开源地址：[dvadmin](https://gitee.com/huge-dream/django-vue3-admin)
+
+### 5. wemirr-platform
+* 简介： 基于java的微服务平台，与fast-crud深度集成
+* 开源地址：[battcn/wemirr-platform](https://gitee.com/battcn/wemirr-platform)
+
+## 三、admin脚手架starter
 
 基于目前市面上开源的高星admin项目fork，集成fast-crud，免去您自己手动集成fast-crud的烦恼。
 您可以选择以下任意一个项目作为脚手架开始你的项目开发。
@@ -28,8 +53,11 @@
 #### 1) fs-admin-antdv :
 轻量级admin，功能单一  
 
-  [预览](http://fast-crud.docmirror.cn/antdv/) /
+  [antdv3 预览](http://fast-crud.docmirror.cn/antdv/) /
   [源码](https://github.com/fast-crud/fs-admin-antdv/)
+
+  [antdv4 预览](http://fast-crud.docmirror.cn/antdv4/) /
+  [源码](https://github.com/fast-crud/fs-admin-antdv4/)
 
 <br/>
 
@@ -132,5 +160,5 @@
 如果你知道比较好的admin项目，欢迎推荐，我将尽快安排它的starter
 
 
-## 三、 starter如何升级
+## 四、 starter如何升级
 请参考升级教程 [脚手架升级](../guide/other/upgrade.html#fs-admin或者starter升级)

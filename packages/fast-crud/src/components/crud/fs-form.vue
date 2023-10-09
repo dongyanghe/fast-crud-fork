@@ -18,7 +18,7 @@
           <fs-form-item
             v-if="item.blank !== true"
             :ref="
-              (el:any) => {
+              (el: any) => {
                 if (el) {
                   formItemRefs[item.key] = el;
                 }
@@ -53,7 +53,7 @@
             <fs-render :render-func="item" :scope="{ ...scope, hasError: errorsRef['group.' + groupKey] }" />
           </template>
           <!-- row -->
-          <component :is="ui.row.name" class="fs-row">
+          <component :is="ui.row.name" class="fs-row" v-bind="row">
             <!-- col -->
             <template v-for="key in groupItem.columns" :key="key">
               <component
@@ -65,7 +65,7 @@
                 <fs-form-item
                   v-if="computedColumns[key] && computedColumns[key]?.blank !== true"
                   :ref="
-                    (el:any) => {
+                    (el: any) => {
                       if (el) {
                         formItemRefs[key] = el;
                       }
@@ -87,15 +87,24 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, getCurrentInstance, onMounted, reactive, Ref, ref, toRaw, unref } from "vue";
+import {
+  computed,
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  reactive,
+  Ref,
+  ref,
+  toRaw,
+  unref,
+  UnwrapNestedRefs
+} from "vue";
 import _ from "lodash-es";
 import { useCompute } from "../../use/use-compute";
 import logger from "../../utils/util.log";
-import { uiContext } from "../../ui";
 import { useMerge } from "../../use/use-merge";
 import { Constants } from "../../utils/util.constants";
-import { FormScopeContext, ScopeContext, SetFormDataOptions, useUi, utils } from "../../index";
-import { UnwrapNestedRefs } from "vue";
+import { FormScopeContext, SetFormDataOptions, useUi, utils } from "../../index";
 
 /**
  * 配置化的表单组件
@@ -202,7 +211,7 @@ export default defineComponent({
       default: undefined
     },
     /**
-     * 行数据
+     * a-row配置
      */
     row: {
       type: Object,
@@ -216,13 +225,20 @@ export default defineComponent({
       default: undefined
     },
     /**
+     * formItem的公共配置
+     */
+    formItem: {
+      type: Object,
+      default: undefined
+    },
+    /**
      * helper位置：{position:'label'}
      */
     helper: {
       type: Object
     }
   },
-  emits: ["reset", "submit", "validationError", "value-change"],
+  emits: ["reset", "submit", "success", "validationError", "value-change"],
   setup(props, ctx) {
     const { merge } = useMerge();
     const { ui } = useUi();
@@ -230,8 +246,10 @@ export default defineComponent({
     const formRef = ref();
     const form: UnwrapNestedRefs<any> = reactive({});
     const { proxy } = getCurrentInstance();
+    // eslint-disable-next-line vue/no-setup-props-destructure
     const initialForm = _.cloneDeep(props.initialForm);
 
+    // eslint-disable-next-line vue/no-setup-props-destructure
     const scope: Ref<FormScopeContext> = ref({
       row: initialForm,
       form,
@@ -245,6 +263,7 @@ export default defineComponent({
       return scope.value;
     }
 
+    // eslint-disable-next-line vue/no-setup-props-destructure
     _.each(props.columns, (item) => {
       if (item.value != null && item.value instanceof AsyncComputeValue) {
         logger.warn("form.value配置不支持AsyncCompute类型的动态计算");
@@ -316,6 +335,7 @@ export default defineComponent({
 
     const groupActiveKey = ref([]);
 
+    // eslint-disable-next-line vue/no-setup-props-destructure
     _.forEach(props.group?.groups, (groupItem, key) => {
       if (groupItem.collapsed !== true) {
         groupActiveKey.value.push(key);
@@ -371,6 +391,8 @@ export default defineComponent({
       const columns: any = [];
       //default columns排序
       _.forEach(computedColumns.value, (value, key) => {
+        const item = _.cloneDeep(props.formItem || {});
+        value = _.merge(item, value);
         value.key = key;
         if (value.order == null) {
           value.order = Constants.orderDefault;
@@ -477,6 +499,7 @@ export default defineComponent({
       if (props.afterSubmit) {
         await props.afterSubmit(submitScope);
       }
+      ctx.emit("success", submitScope);
     }
 
     function getFormData() {
@@ -585,6 +608,26 @@ export default defineComponent({
   }
 
   .fs-form-invalid {
+  }
+
+  .fs-form-item-component {
+    .ant-picker,
+    .ant-input-number,
+    .el-cascader,
+    .el-date-editor,
+    .el-input-number,
+    .n-select,
+    .n-date-picker,
+    .n-input-number {
+      width: 100%;
+    }
+
+    .el-date-editor .el-range__icon {
+      margin-left: 10px;
+    }
+    .el-date-editor .el-range__close-icon {
+      margin-right: 10px;
+    }
   }
 
   //.el-date-editor.el-input__wrapper {

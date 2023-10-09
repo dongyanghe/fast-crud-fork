@@ -3,6 +3,112 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.17.5](https://github.com/fast-crud/fast-crud/compare/v1.17.4...v1.17.5) (2023-09-26)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-element
+
+## [1.17.4](https://github.com/fast-crud/fast-crud/compare/v1.17.3...v1.17.4) (2023-09-26)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-element
+
+## [1.17.3](https://github.com/fast-crud/fast-crud/compare/v1.17.2...v1.17.3) (2023-09-23)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-element
+
+## [1.17.2](https://github.com/fast-crud/fast-crud/compare/v1.17.1...v1.17.2) (2023-09-16)
+
+### Bug Fixes
+
+* 修复naive 时间示例无法修改的bug ([6ab9218](https://github.com/fast-crud/fast-crud/commit/6ab92188fc19d792de8bed0190853c444784b009))
+
+## [1.17.1](https://github.com/fast-crud/fast-crud/compare/v1.17.0...v1.17.1) (2023-09-13)
+
+### Performance Improvements
+
+* table select 支持返回object对象 ([08c5d20](https://github.com/fast-crud/fast-crud/commit/08c5d20a2570e824b2698335ef23c806fc979788))
+
+# [1.17.0](https://github.com/fast-crud/fast-crud/compare/v1.16.11...v1.17.0) (2023-09-12)
+
+### Performance Improvements
+
+* 默认label宽度超出后省略+title提示 ([3953dee](https://github.com/fast-crud/fast-crud/commit/3953deeaf33e11ef2501ae99e54d15d62d2a5edb))
+
+## [1.16.11](https://github.com/fast-crud/fast-crud/compare/v1.16.10...v1.16.11) (2023-09-03)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-element
+
+## [1.16.10](https://github.com/fast-crud/fast-crud/compare/v1.16.9...v1.16.10) (2023-09-03)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-element
+
+## [1.16.9](https://github.com/fast-crud/fast-crud/compare/v1.16.8...v1.16.9) (2023-09-03)
+
+### Performance Improvements
+
+* 表单下所有组件优化为宽度100% ([da38460](https://github.com/fast-crud/fast-crud/commit/da384605f9c6bfc26359a369613dce4f48a3ba64))
+
+## [1.16.8](https://github.com/fast-crud/fast-crud/compare/v1.16.7...v1.16.8) (2023-09-03)
+
+### Performance Improvements
+
+* 翻页后自动滚动到顶部 ([a6e5f67](https://github.com/fast-crud/fast-crud/commit/a6e5f6740a59780995283c7d787864fdd65f0d4b))
+
+## [1.16.7](https://github.com/fast-crud/fast-crud/compare/v1.16.6...v1.16.7) (2023-08-21)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-element
+
+## [1.16.6](https://github.com/fast-crud/fast-crud/compare/v1.16.5...v1.16.6) (2023-08-21)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-element
+
+## [1.16.5](https://github.com/fast-crud/fast-crud/compare/v1.16.4...v1.16.5) (2023-08-20)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-element
+
+## [1.16.4](https://github.com/fast-crud/fast-crud/compare/v1.16.3...v1.16.4) (2023-08-18)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-element
+
+## [1.16.3](https://github.com/fast-crud/fast-crud/compare/v1.16.2...v1.16.3) (2023-08-18)
+
+### Performance Improvements
+
+* fs-button增加buttonProps参数，当fs-button的属性与x-button属性名重复时使用 ([5ca5333](https://github.com/fast-crud/fast-crud/commit/5ca53330f8bcf8d7acf4eb921aa92b83c41de52a))
+
+## [1.16.2](https://github.com/fast-crud/fast-crud/compare/v1.16.1...v1.16.2) (2023-08-10)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-element
+
+## [1.16.1](https://github.com/fast-crud/fast-crud/compare/v1.16.0...v1.16.1) (2023-08-09)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-element
+
+# [1.16.0](https://github.com/fast-crud/fast-crud/compare/v1.15.1...v1.16.0) (2023-08-07)
+
+### Features
+
+* 列设置支持自定义样式 ([df86e04](https://github.com/fast-crud/fast-crud/commit/df86e04dcbc615f254e15abbe10758b934d69492))
+
+## [1.15.1](https://github.com/fast-crud/fast-crud/compare/v1.15.0...v1.15.1) (2023-08-05)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-element
+
+# [1.15.0](https://github.com/fast-crud/fast-crud/compare/v1.14.7...v1.15.0) (2023-08-05)
+
+### Features
+
+* antdv4 支持 ([1935614](https://github.com/fast-crud/fast-crud/commit/19356142cda925d1248fe7c84c18cb8324ce5f70))
+
+## [1.14.7](https://github.com/fast-crud/fast-crud/compare/v1.14.6...v1.14.7) (2023-07-24)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-element
+
+## [1.14.6](https://github.com/fast-crud/fast-crud/compare/v1.14.5...v1.14.6) (2023-07-23)
+
+### Bug Fixes
+
+* 修复element 版 search select组件右边超出显示的问题 ([ff11cf4](https://github.com/fast-crud/fast-crud/commit/ff11cf4f9c6ac63d997b5cad2067123c01cd299b))
+
 ## [1.14.5](https://github.com/fast-crud/fast-crud/compare/v1.14.4...v1.14.5) (2023-07-04)
 
 ### Bug Fixes

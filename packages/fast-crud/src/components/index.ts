@@ -26,6 +26,7 @@ import FsCell from "./crud/fs-cell";
 import FsEditableCell from "./crud/editable/fs-editable-cell";
 import FsActionbar from "./actionbar/index.vue";
 import FsToolbar from "./toolbar/index.vue";
+import FsColumnsFilterLayoutDefault from "./toolbar/fs-table-columns-filter/fs-columns-filter-layout-default.vue";
 
 import FsSearch from "./search/index.vue";
 import FsSearchV1 from "./search/search_v1.vue";
@@ -42,6 +43,7 @@ import FsDictCheckbox from "./extends/fs-dict-checkbox.vue";
 import FsDictSwitch from "./extends/fs-dict-switch.vue";
 import FsDateFormat from "./extends/fs-date-format.vue";
 import FsDictTree from "./extends/fs-dict-tree.vue";
+import FsTableSelect from "./extends/fs-table-select.vue";
 export {
   FsPage,
   FsContainer,
@@ -71,6 +73,7 @@ export {
   FsTabsFilter,
   FsActionbar,
   FsToolbar,
+  FsColumnsFilterLayoutDefault,
   FsDictRadio,
   FsDictSelect,
   FsValuesFormat,
@@ -80,5 +83,6 @@ export {
   FsDictSwitch,
   FsDateFormat,
   FsBox,
-  FsDictTree
+  FsDictTree,
+  FsTableSelect
 };

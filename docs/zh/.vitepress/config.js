@@ -38,7 +38,8 @@ module.exports = {
                         {text: '集成到你的项目', link: '/guide/start/integration'},
                         {text: '国际化', link: '/guide/start/i18n'},
                         {text: '图标', link: '/guide/start/icon'},
-                        {text: '新手必看', link: '/guide/start/grow'}
+                        {text: '新手必看', link: '/guide/start/grow'},
+                        {text: '通用规则', link: '/guide/start/tenet'}
                     ],
                 },
                 {
@@ -52,7 +53,7 @@ module.exports = {
                         {text: '数据字典', link: '/guide/advance/dict'},
                         {text: '动态计算', link: '/guide/advance/compute'},
                         {text: '自定义组件', link: '/guide/advance/custom-component'},
-                        {text: '页面布局', link: '/guide/advance/layout'},
+                        {text: '自定义布局', link: '/guide/advance/layout'},
                         {text: '插槽', link: '/guide/advance/slots'},
                         {text: '扩展', link: '/guide/advance/extends'},
                         {text: '权限控制', link: '/guide/advance/permission'},
@@ -169,6 +170,7 @@ module.exports = {
                                 {text: 'fs-table', link: "/api/components/crud/crud/fs-table"},
                                 {text: 'fs-row-handle', link: "/api/components/crud/crud/fs-row-handle"},
                                 {text: 'fs-form-wrapper', link: "/api/components/crud/crud/fs-form-wrapper"},
+                                {text: 'fs-form-provider', link: "/api/components/crud/crud/fs-form-provider"},
                                 {text: 'fs-form', link: "/api/components/crud/crud/fs-form"},
                                 {text: 'fs-form-item', link: "/api/components/crud/crud/fs-form-item"},
                                 {text: 'fs-form-helper', link: "/api/components/crud/crud/fs-form-helper"},
@@ -190,6 +192,7 @@ module.exports = {
                                 {text: 'fs-dict-switch', link: "/api/components/crud/extends/fs-dict-switch"},
                                 {text: 'fs-dict-tree', link: "/api/components/crud/extends/fs-dict-tree"},
                                 {text: 'fs-values-format', link: "/api/components/crud/extends/fs-values-format"},
+                                {text: 'fs-table-select', link: "/api/components/crud/extends/fs-table-select"},
                             ]
                         },
                         {

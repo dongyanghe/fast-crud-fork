@@ -44,6 +44,7 @@ import {
   SwitchCI,
   TableCI,
   TableColumnCI,
+  TableScrollReq,
   TabPaneCI,
   TabsCI,
   TagCI,
@@ -101,18 +102,9 @@ export class Naive implements UiInterface {
     },
     titleSlotName: "header",
     buildOnClosedBind(is: string, onClosed: Function): {} {
-      if (is === "n-modal") {
-        return { afterClose: onClosed };
-      } else if (is === "n-drawer") {
-        return {
-          afterVisibleChange: (visible: boolean) => {
-            if (visible === false) {
-              onClosed(visible);
-            }
-          }
-        };
-      }
-      return {};
+      return {
+        onAfterLeave: onClosed
+      };
     },
     buildWidthBind(is: string, width: any) {
       return { style: { width: width } };
@@ -295,11 +287,14 @@ export class Naive implements UiInterface {
     visible: "show",
     customClass: "class",
     titleSlotName: "header",
+    footerSlotName: "action",
     footer(footer = null) {
       return { footer };
     },
     buildOnClosedBind(onClosed: Function): {} {
-      return { afterClose: onClosed };
+      return {
+        onAfterLeave: onClosed
+      };
     },
     buildWidthBind(width) {
       return { style: { width: width } };
@@ -325,7 +320,18 @@ export class Naive implements UiInterface {
       });
     },
     builder(opts) {
-      return buildBinding(this, opts, {});
+      return buildBinding(this, opts, {
+        props: {
+          preset: "dialog",
+          title: opts.title,
+          style: {
+            width: opts.width
+          }
+        },
+        slots: {
+          footer: opts.footer
+        }
+      });
     }
   });
 
@@ -444,6 +450,7 @@ export class Naive implements UiInterface {
     prop: "name",
     label: "label",
     rules: "rule",
+    skipValidationWrapper: "div",
     injectFormItemContext: () => {
       const formItemContext = inject(formItemInjectionKey);
       return {
@@ -500,7 +507,10 @@ export class Naive implements UiInterface {
   select: SelectCI = creator<SelectCI>({
     name: "n-select",
     modelValue: "value",
-    clearable: "clearable"
+    clearable: "clearable",
+    buildMultiBinding: (multiple) => {
+      return { multiple };
+    }
   });
 
   treeSelect: TreeSelectCI = creator<TreeSelectCI>({
@@ -532,6 +542,34 @@ export class Naive implements UiInterface {
     fixedHeaderNeedComputeBodyHeight: true,
     headerDomSelector: ".n-data-table-thead",
     vLoading: false,
+    scrollTo(req: TableScrollReq) {
+      req.tableRef.value.scrollTo({ top: req.top });
+    },
+    buildSelectionBinding(req) {
+      const onSelectionChange = (changed: any) => {
+        req.onSelectedKeysChanged(changed);
+      };
+
+      return {
+        table: {
+          checkedRowKeys: req.selectedRowKeys,
+          "onUpdate:checkedRowKeys": onSelectionChange
+        },
+        columns: {
+          $checked: {
+            form: { show: false },
+            column: {
+              multiple: !!req.multiple,
+              type: "selection",
+              align: "center",
+              width: "55px",
+              order: -9999,
+              columnSetDisabled: true //禁止在列设置中选择
+            }
+          }
+        }
+      };
+    },
     onChange({ onSortChange, onFilterChange, onPagination, bubbleUp }) {
       return {
         "onUpdate:filters": (filters: any, initiatorColumn: any) => {

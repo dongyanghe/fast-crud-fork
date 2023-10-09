@@ -1,6 +1,7 @@
 import {
   computed,
   defineComponent,
+  getCurrentInstance,
   PropType,
   ref,
   resolveDirective,
@@ -15,16 +16,16 @@ import logger from "../../utils/util.log";
 import utilLog from "../../utils/util.log";
 import "./fs-table.less";
 import { ColumnProps, ConditionalRenderProps, ScopeContext, TableColumnsProps, WriteableSlots } from "../../d";
-import { UiInterface } from "@fast-crud/ui-interface/src";
-import { Constants } from "../../utils/util.constants";
+import { UiInterface } from "@fast-crud/ui-interface";
 
 type BuildTableColumnsOption = {
   props: any;
   ui: UiInterface;
+  sortedColumns: TableColumnsProps;
   renderRowHandle: any;
   renderCellComponent: any;
 };
-function buildTableSlots({ props, ui, renderRowHandle, renderCellComponent }: BuildTableColumnsOption) {
+function buildTableSlots({ props, ui, sortedColumns, renderRowHandle, renderCellComponent }: BuildTableColumnsOption) {
   const tableComp = resolveDynamicComponent(ui.table.name);
   const tableColumnComp = resolveDynamicComponent(ui.tableColumn.name);
   const tableColumnGroupComp = resolveDynamicComponent(ui.tableColumnGroup.name);
@@ -76,7 +77,7 @@ function buildTableSlots({ props, ui, renderRowHandle, renderCellComponent }: Bu
         />
       );
     };
-    _.forEach(props.columns, (item) => {
+    _.forEach(sortedColumns, (item) => {
       if (item.show === false) {
         return;
       }
@@ -111,16 +112,6 @@ function buildTableSlots({ props, ui, renderRowHandle, renderCellComponent }: Bu
 }
 
 /**
- * 排序
- * @param arr
- */
-function doArraySort(arr: any) {
-  return _.sortBy(arr, (item) => {
-    return item.order ?? Constants.orderDefault;
-  });
-}
-
-/**
  * 通过config来渲染列
  * @param props
  * @param componentRefs
@@ -128,10 +119,10 @@ function doArraySort(arr: any) {
  * @returns {*[]}
  */
 function buildTableColumns(options: any): any[] {
-  const { props, renderRowHandle, renderCellComponent } = options;
+  const { props, renderRowHandle, renderCellComponent, sortedColumns } = options;
   const { ui } = useUi();
-  const originalColumns = options.columns ?? {};
-  let columns: ColumnProps[] = [];
+  const originalColumns = sortedColumns ?? {};
+  const columns: ColumnProps[] = [];
 
   for (const key in originalColumns) {
     const column = originalColumns[key];
@@ -143,7 +134,7 @@ function buildTableColumns(options: any): any[] {
     columns.push(item);
     if (column.children != null) {
       // 表头分组
-      const childOptions = { ...options, columns: column.children };
+      const childOptions = { ...options, sortedColumns: column.children };
       delete childOptions.renderRowHandle;
       item.children = buildTableColumns(childOptions);
     } else if (column.type != null) {
@@ -185,7 +176,6 @@ function buildTableColumns(options: any): any[] {
     columns.push(rowHandle);
   }
 
-  columns = doArraySort(columns);
   utilLog.debug("table columns:", columns);
   return columns;
 }
@@ -275,16 +265,23 @@ export default defineComponent({
       return cellRef?.getTargetRef();
     };
 
+    const { ui } = useUi();
+
+    const currentRef = getCurrentInstance();
     watch(
       () => {
         return props.data;
       },
       (value) => {
+        ui.table.scrollTo({
+          top: 0,
+          tableRef,
+          fsTableRef: currentRef
+        });
         ctx.emit("data-change", { data: value });
       }
     );
 
-    const { ui } = useUi();
     const tableComp = resolveDynamicComponent(ui.table.name);
     const tableColumnCI = ui.tableColumn;
 
@@ -318,7 +315,7 @@ export default defineComponent({
       onFilterChange: (filters: any) => {
         ctx.emit("filter-change", filters);
       },
-      onPagination: (pagination: any) => {
+      onPagination: () => {
         //
       },
       bubbleUp: (onChange) => {
@@ -422,10 +419,20 @@ export default defineComponent({
     const computedBinding = computed(() => {
       return _.merge({}, ctx.attrs, events);
     });
+    const sortedColumns = computed(() => {
+      // 已经在useColumns中排序过了
+      return props.columns;
+    });
     if (renderMode === "slot") {
       //使用slot column ，element-plus
       const computedTableSlots = computed(() => {
-        return buildTableSlots({ props, ui, renderRowHandle, renderCellComponent } as BuildTableColumnsOption);
+        return buildTableSlots({
+          props,
+          ui,
+          sortedColumns: sortedColumns.value,
+          renderRowHandle,
+          renderCellComponent
+        } as BuildTableColumnsOption);
       });
 
       return () => {
@@ -456,6 +463,7 @@ export default defineComponent({
           ctx,
           ui,
           getContextFn,
+          sortedColumns: sortedColumns.value,
           componentRefs,
           renderRowHandle,
           renderCellComponent,

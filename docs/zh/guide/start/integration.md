@@ -41,6 +41,9 @@ pnpm i  @fast-crud/ui-element
 # or antdv
 pnpm i  ant-design-vue
 pnpm i  @fast-crud/ui-antdv
+# antdv4
+pnpm i  @fast-crud/ui-antdv4  # <<<-----------------antdv4注意这里
+
 # or naive-ui
 pnpm i  naive-ui
 pnpm i  @fast-crud/ui-naive
@@ -86,8 +89,15 @@ import "@fast-crud/fast-crud/dist/style.css";
 // 请选择ui: element/ antdv /naive。三选一，不支持动态切换
 // element 
 import ui from "@fast-crud/ui-element";
+
 // antdv 
 import ui from "@fast-crud/ui-antdv";
+
+// antdv4
+import ui from '@fast-crud/ui-antdv4'  // <<<-----------antdv4注意这里
+// antdv4 需要额外加载css样式
+import "@fast-crud/ui-antdv4/dist/style.css";
+
 // naive 
 import ui from "@fast-crud/ui-naive";
 
@@ -204,6 +214,7 @@ import _ from "lodash-es";
 
 //此处为crudOptions配置
 const createCrudOptions = function ({ crudOptions, context }: CreateCrudOptionsProps): CreateCrudOptionsRet {
+  const {props,ctx} = context
   //本地模拟后台crud接口方法 ----开始
   const records = [{ id: 1, name: "Hello World", type: 1 }];
   const pageRequest = async (query: UserPageQuery): Promise<UserPageRes> => {
@@ -274,11 +285,13 @@ const createCrudOptions = function ({ crudOptions, context }: CreateCrudOptionsP
 //此处为组件定义
 export default defineComponent({
   name: "FsCrudHelloWorld",
-  setup() {
+  setup(props:any,ctx:any) {
     // 演示自定义变量传递, 将会传递给createCrudOptions
-    const customValue: any = {};
+    const context: any = {
+      props,ctx
+    };
     //  =======你可以简写为下面这一行========
-    const { crudRef, crudBinding, crudExpose, context } = useFs({ createCrudOptions, context:customValue });
+    const { crudRef, crudBinding, crudExpose } = useFs({ createCrudOptions, context });
 
     // 页面打开后获取列表数据
     onMounted(() => {

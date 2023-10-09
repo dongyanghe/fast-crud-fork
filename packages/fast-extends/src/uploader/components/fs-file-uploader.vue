@@ -3,7 +3,6 @@
     <component :is="ui.upload.name" ref="fileUploaderRef" v-model:fileList="fileList" v-bind="computedBinding">
       <component :is="computedFileSelectBtn.is" v-bind="computedFileSelectBtn" />
     </component>
-    <fs-uploader ref="uploaderImplRef" :type="uploader?.type" />
     <component
       :is="ui.dialog.name"
       v-if="isPicture()"
@@ -16,11 +15,11 @@
 </template>
 
 <script lang="ts">
-import { AppContext, computed, defineComponent, nextTick, Ref, ref, watch } from "vue";
-import { uiContext, useI18n, useUi } from "@fast-crud/fast-crud";
+import { computed, defineComponent, nextTick, Ref, ref, watch } from "vue";
+import { useI18n, useUi } from "@fast-crud/fast-crud";
 import _ from "lodash-es";
-import FsUploader from "./fs-uploader.vue";
-import { FileItem, FsUploaderDoUploadOptions } from "../d.ts/type";
+import { FileItem, FsUploaderDoUploadOptions } from "../d/type";
+import { useUploader } from "./utils";
 
 /**
  * 文件上传组件
@@ -28,7 +27,6 @@ import { FileItem, FsUploaderDoUploadOptions } from "../d.ts/type";
  */
 export default defineComponent({
   name: "FsFileUploader",
-  components: { FsUploader },
   inheritAttrs: false,
   props: {
     /**
@@ -92,6 +90,8 @@ export default defineComponent({
     },
     /**
      * fs-uploader的配置
+     * 可以覆盖全局配置里各个上传类型对应的配置
+     * 例如: `{action:'xxx',bucket:'xxx',...}`
      */
     uploader: {
       type: Object
@@ -103,13 +103,18 @@ export default defineComponent({
       type: Object
     },
     /**
-     * 返回值类型
-     * 支持：`[object,url,key,其他（successHandle返回的object内要有该字段）]`
+     * 上传成功后从结果中取值类型
+     * 支持：`[object,url,key,其他（successHandle返回的object内要有该字段，不要用'id'）]`
+     * 如果配置了非url，则需要配置buildUrl用于反显
      */
     valueType: {
       type: String, // url ,key, object
       default: "url"
-    }
+    },
+    /**
+     * 根据value获取文件名，用于显示在fileList里面
+     */
+    getFileName: {}
   },
   emits: ["change", "update:modelValue", "success", "exceed"],
   setup(props: any, ctx: any) {
@@ -120,14 +125,23 @@ export default defineComponent({
     const currentValue: Ref = ref();
     const fileUploaderRef: Ref = ref();
 
-    function pickFileName(url: string) {
-      const suffix = url.substring(url.lastIndexOf("/") + 1);
-      const wenIndex = suffix.indexOf("?");
-      if (wenIndex >= 0) {
-        return suffix.substring(0, wenIndex);
-      }
-      return suffix;
-    }
+    const pickFileName = computed(() => {
+      return (
+        props.getFileName ||
+        ((url: string) => {
+          if (typeof url !== "string") {
+            console.warn("获取文件名失败，请配置getFileName");
+            return url;
+          }
+          const suffix = url.substring(url.lastIndexOf("/") + 1);
+          const wenIndex = suffix.indexOf("?");
+          if (wenIndex >= 0) {
+            return suffix.substring(0, wenIndex);
+          }
+          return suffix;
+        })
+      );
+    });
 
     function getValueByValueType(item: any) {
       if (props.valueType === "object") {
@@ -146,7 +160,12 @@ export default defineComponent({
       const arr = [];
       for (let value of list) {
         let fileValue: any;
-        if (typeof value === "string") {
+        if (
+          typeof value === "string" ||
+          typeof value === "number" ||
+          typeof value === "boolean" ||
+          value instanceof Date
+        ) {
           fileValue = {
             url: undefined,
             key: value,
@@ -170,7 +189,7 @@ export default defineComponent({
       for (const item of arr) {
         if (!item.name) {
           const url = item.url || item.value;
-          item.name = pickFileName(url);
+          item.name = pickFileName.value(url);
         }
       }
       return arr;
@@ -280,6 +299,8 @@ export default defineComponent({
         await initFileList(value);
       }
     );
+    //@ts-ignore
+    // eslint-disable-next-line vue/no-setup-props-destructure
     initFileList(props.modelValue);
     function hasUploading() {
       const uploading = fileList.value.filter((item: any) => {
@@ -297,8 +318,6 @@ export default defineComponent({
       ctx.emit("success", { res, file, fileList: list });
       handleChange(file, list);
     }
-
-    const uploaderImplRef: Ref = ref();
 
     function formatFileSize(fileSize: number) {
       let sizeTip;
@@ -369,8 +388,9 @@ export default defineComponent({
     }
 
     async function doUpload(option: FsUploaderDoUploadOptions) {
-      option.options = props.uploader;
-      let uploaderRef = uploaderImplRef.value.getUploaderRef();
+      option.options = props.uploader || {};
+      const { getUploaderImpl } = useUploader();
+      let uploaderRef = await getUploaderImpl(option.options.type);
       if (uploaderRef == null) {
         ui.message.warn("Sorry，The uploader component is not ready yet");
         throw new Error("Sorry，The component is not ready yet");
@@ -550,12 +570,14 @@ export default defineComponent({
           checkLimit();
           ctx.emit("exceed", { fileList: fileList.value });
         },
-        onRemove: (file: any) => {
-          handleChange(file, fileList.value);
+        onRemove: (opts: any) => {
+          const { file, fileList } = opts;
+          // handleChange(file, [...fileList]);
         },
-        onChange: ({ event, file, fileList }: any) => {
-          fileList = appendExtra(fileList);
-          handleChange(file, fileList);
+        onChange: (opts: any) => {
+          const { event, file, fileList } = opts;
+          const list = appendExtra(fileList);
+          handleChange(file, [...list]);
         },
         onFinish: (file: any) => {
           const extra = naiveExtraCache[file.id];
@@ -593,7 +615,6 @@ export default defineComponent({
       onInput,
       hasUploading,
       isPicture,
-      uploaderImplRef,
       computedFileSelectBtn,
       previewVisible,
       previewImage,
@@ -614,10 +635,12 @@ export default defineComponent({
   }
   .ant-upload-list-item-actions {
     display: flex;
+    justify-content: center;
     align-items: center;
     > a {
       display: flex;
       align-items: center;
+      justify-content: center;
     }
   }
 

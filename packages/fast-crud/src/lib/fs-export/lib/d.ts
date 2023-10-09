@@ -1,3 +1,5 @@
+import { ColumnCompositionProps, ColumnProps } from "../../../d";
+
 export type ExportUtil = {
   csv: (params: CsvParams) => Promise<void>;
   excel: (params: ExcelParams) => Promise<void>;
@@ -21,7 +23,11 @@ export type CsvParams = {
   separator?: string;
   quoted?: boolean;
 };
+/**
+ * 导出列配置
+ */
 export type ExportColumn = {
+  columnProps?: ColumnProps;
   key: string;
   title: string;
   width?: number;

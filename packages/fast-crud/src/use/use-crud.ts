@@ -5,6 +5,8 @@ import logger from "../utils/util.log";
 import { uiContext } from "../ui";
 import { useI18n } from "../locale";
 import {
+  ColumnCompositionProps,
+  ColumnProps,
   ComputeContext,
   CrudBinding,
   CrudExpose,
@@ -14,9 +16,9 @@ import {
   TableColumnsProps
 } from "../d";
 import { useCompute } from "./use-compute";
-import { buildTableColumnsFlatMap, useColumns } from "./use-columns";
+import { buildTableColumnsFlatMap, forEachTableColumns, useColumns } from "./use-columns";
 import { CrudOptions } from "../d/crud";
-import { computed, Ref, ref } from "vue";
+import { computed, nextTick, Ref, ref } from "vue";
 import { useExpose } from "./use-expose";
 import { exportTable } from "../lib/fs-export";
 
@@ -44,7 +46,11 @@ export type UseCrudRet = {
    * @param overOptions
    */
   resetCrudOptions: (options: DynamicType<CrudOptions>) => void;
-
+  /**
+   * 覆盖crudOptions配置
+   * @param overOptions
+   */
+  appendCrudOptions: (options: DynamicType<CrudOptions>) => DynamicType<CrudOptions>;
   /**
    * 追加配置,注意是覆盖crudBinding的结构，而不是crudOptions的结构
    * @param overBinding
@@ -56,7 +62,7 @@ export type UseCrudRet = {
 export function useCrud(ctx: UseCrudProps): UseCrudRet {
   const ui = uiContext.get();
   const { t } = useI18n();
-  const options: CrudOptions = ctx.crudOptions as CrudOptions;
+  let options: CrudOptions = ctx.crudOptions as CrudOptions;
   const crudExpose = ctx.expose || ctx.crudExpose;
   if (!crudExpose) {
     throw new Error("crudExpose不能为空，请给useCrud传入{crudExpose}参数");
@@ -89,29 +95,27 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
 
   function useFormSubmit() {
     return {
-      editForm: {
+      form: {
         async doSubmit(context: ScopeContext) {
-          doValueResolve(context);
-          if (options.mode?.name === "local") {
-            expose.updateTableRow(context.index, context.form, options.mode.isMergeWhenUpdate);
-          } else {
-            const res = await crudBinding.value.request.editRequest(context);
-            doRefresh();
-            return res;
+          if (context.mode === "edit") {
+            doValueResolve(context);
+            if (options.mode?.name === "local") {
+              expose.updateTableRow(context.index, context.form, options.mode.isMergeWhenUpdate);
+            } else {
+              return await crudBinding.value.request.editRequest(context);
+            }
+          } else if (context.mode === "add") {
+            doValueResolve(context);
+            if (options.mode?.name === "local") {
+              const index = options.mode.isAppendWhenAdd ? expose.getTableData().length : 0;
+              expose.insertTableRow(index, context.form);
+            } else {
+              return await crudBinding.value.request.addRequest(context);
+            }
           }
-        }
-      },
-      addForm: {
-        async doSubmit(context: ScopeContext) {
-          doValueResolve(context);
-          if (options.mode?.name === "local") {
-            const index = options.mode.isAppendWhenAdd ? expose.getTableData().length : 0;
-            expose.insertTableRow(index, context.form);
-          } else {
-            const res = await crudBinding.value.request.addRequest(context);
-            doRefresh();
-            return res;
-          }
+        },
+        async onSuccess() {
+          doRefresh();
         }
       }
     };
@@ -156,7 +160,27 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
   function useSearch() {
     return {
       search: {
-        doSearch,
+        on_reset() {
+          crudBinding.value.table.sort = {};
+          forEachTableColumns(crudBinding.value.table.columns, (column: ColumnCompositionProps) => {
+            //清空sort
+            column.sortOrder = false;
+          });
+          //element 清空sort
+          const baseTableRef = crudExpose.getBaseTableRef();
+          if (baseTableRef?.clearSort) {
+            baseTableRef.clearSort();
+          }
+        },
+        onSearch() {
+          crudExpose.doRefresh({ goFirstPage: true });
+        },
+        ["onUpdate:form"]: (value: any) => {
+          crudBinding.value.search.form = value;
+        },
+        ["onUpdate:validatedForm"]: (value: any) => {
+          crudBinding.value.search.validatedForm = value;
+        },
         ["onUpdate:collapse"]: (value: any) => {
           crudBinding.value.search.collapse = value;
         },
@@ -172,10 +196,10 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
 
   function useTabs() {
     return {
-      tabs: {
-        onChange: () => {
-          doRefresh();
-        }
+      tabs: {},
+      onTabChange(formData: any) {
+        crudExpose.setSearchFormData({ form: formData });
+        doRefresh();
       }
     };
   }
@@ -264,6 +288,15 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
       table: {
         onSortChange(sortChange: { isServerSort: boolean; prop: any; asc: any; order: any }) {
           const { isServerSort, prop, asc, order } = sortChange;
+
+          forEachTableColumns(crudBinding.value.table.columns, (column: ColumnProps) => {
+            if (column.key === prop) {
+              column.sortOrder = order;
+            } else {
+              column.sortOrder = false;
+            }
+          });
+
           const oldSort = crudBinding.value.table.sort;
           crudBinding.value.table.sort = isServerSort ? { prop, order, asc } : null;
           if (isServerSort || oldSort != null) {
@@ -370,6 +403,10 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
     };
   }
 
+  function afterUseCrud(bindings: CrudBinding) {
+    bindings.search.validatedForm = _.cloneDeep(bindings.search.initialForm);
+  }
+
   function rebuildCrudBindings(options: DynamicallyCrudOptions) {
     const userOptions = merge(
       defaultCrudOptions.defaultOptions({ t }),
@@ -388,13 +425,22 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
 
     const { buildColumns } = useColumns();
     //初始化columns，将crudOptions.columns里面的配置转化为crudBinding
-    return buildColumns(userOptions);
+    const bindings = buildColumns(userOptions);
+    afterUseCrud(bindings);
+    return bindings;
   }
 
   function resetCrudOptions(options: DynamicallyCrudOptions) {
     // 设置crudOptions Ref
     crudBinding.value = rebuildCrudBindings(options);
     logger.info("fast-crud inited, crudBinding=", crudBinding.value);
+  }
+
+  function appendCrudOptions(overOptions: DynamicallyCrudOptions): DynamicallyCrudOptions {
+    const newOptions = merge({}, options, overOptions);
+    resetCrudOptions(newOptions);
+    options = newOptions;
+    return newOptions;
   }
 
   resetCrudOptions(options);
@@ -408,6 +454,7 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
   }
 
   return {
+    appendCrudOptions,
     resetCrudOptions,
     appendCrudBinding
   };
@@ -417,6 +464,7 @@ export type UseFsRet = {
   crudRef: Ref;
   crudBinding: Ref<CrudBinding>;
   crudExpose: CrudExpose;
+  context: UseFsContext;
 } & UseCrudRet &
   CreateCrudOptionsRet;
 
@@ -449,7 +497,7 @@ export type UseFsProps<T = UseFsContext> = {
 
   crudExposeRef?: Ref<CrudExpose>;
   createCrudOptions: CreateCrudOptions | CreateCrudOptionsAsync;
-
+  crudOptionsOverride?: DynamicallyCrudOptions;
   onExpose?: (context: OnExposeContext<T>) => any;
 
   context?: T;
@@ -492,13 +540,15 @@ function useFsImpl(props: UseFsProps): UseFsRet | Promise<UseCrudRet> {
   });
 
   function initCrud(createCrudOptionsRet: CreateCrudOptionsRet) {
+    merge(createCrudOptionsRet.crudOptions, props.crudOptionsOverride);
     const useCrudRet = useCrud({ crudExpose, ...createCrudOptionsRet, context });
     return {
       ...createCrudOptionsRet,
       ...useCrudRet,
       crudRef,
       crudExpose,
-      crudBinding
+      crudBinding,
+      context
     };
   }
 

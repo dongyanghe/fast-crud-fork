@@ -3,6 +3,112 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.17.5](https://github.com/fast-crud/fast-crud/compare/v1.17.4...v1.17.5) (2023-09-26)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-antdv
+
+## [1.17.4](https://github.com/fast-crud/fast-crud/compare/v1.17.3...v1.17.4) (2023-09-26)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-antdv
+
+## [1.17.3](https://github.com/fast-crud/fast-crud/compare/v1.17.2...v1.17.3) (2023-09-23)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-antdv
+
+## [1.17.2](https://github.com/fast-crud/fast-crud/compare/v1.17.1...v1.17.2) (2023-09-16)
+
+### Bug Fixes
+
+* 修复naive 时间示例无法修改的bug ([6ab9218](https://github.com/fast-crud/fast-crud/commit/6ab92188fc19d792de8bed0190853c444784b009))
+
+## [1.17.1](https://github.com/fast-crud/fast-crud/compare/v1.17.0...v1.17.1) (2023-09-13)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-antdv
+
+# [1.17.0](https://github.com/fast-crud/fast-crud/compare/v1.16.11...v1.17.0) (2023-09-12)
+
+### Performance Improvements
+
+* dict.getNodesByValues 修改为单例模式也可以运行，无需配置prototype，优化性能 ([be4a6a7](https://github.com/fast-crud/fast-crud/commit/be4a6a744a97cb92e6da2b8094dd3930be6ebdc2))
+
+## [1.16.11](https://github.com/fast-crud/fast-crud/compare/v1.16.10...v1.16.11) (2023-09-03)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-antdv
+
+## [1.16.10](https://github.com/fast-crud/fast-crud/compare/v1.16.9...v1.16.10) (2023-09-03)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-antdv
+
+## [1.16.9](https://github.com/fast-crud/fast-crud/compare/v1.16.8...v1.16.9) (2023-09-03)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-antdv
+
+## [1.16.8](https://github.com/fast-crud/fast-crud/compare/v1.16.7...v1.16.8) (2023-09-03)
+
+### Performance Improvements
+
+* 翻页后自动滚动到顶部 ([a6e5f67](https://github.com/fast-crud/fast-crud/commit/a6e5f6740a59780995283c7d787864fdd65f0d4b))
+
+## [1.16.7](https://github.com/fast-crud/fast-crud/compare/v1.16.6...v1.16.7) (2023-08-21)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-antdv
+
+## [1.16.6](https://github.com/fast-crud/fast-crud/compare/v1.16.5...v1.16.6) (2023-08-21)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-antdv
+
+## [1.16.5](https://github.com/fast-crud/fast-crud/compare/v1.16.4...v1.16.5) (2023-08-20)
+
+### Bug Fixes
+
+* 修复initialForm会覆盖editForm的bug ([c1d0d8a](https://github.com/fast-crud/fast-crud/commit/c1d0d8a3bef2586386a59c9211de7ca45be83f08))
+
+## [1.16.4](https://github.com/fast-crud/fast-crud/compare/v1.16.3...v1.16.4) (2023-08-18)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-antdv
+
+## [1.16.3](https://github.com/fast-crud/fast-crud/compare/v1.16.2...v1.16.3) (2023-08-18)
+
+### Performance Improvements
+
+* fs-button增加buttonProps参数，当fs-button的属性与x-button属性名重复时使用 ([5ca5333](https://github.com/fast-crud/fast-crud/commit/5ca53330f8bcf8d7acf4eb921aa92b83c41de52a))
+
+## [1.16.2](https://github.com/fast-crud/fast-crud/compare/v1.16.1...v1.16.2) (2023-08-10)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-antdv
+
+## [1.16.1](https://github.com/fast-crud/fast-crud/compare/v1.16.0...v1.16.1) (2023-08-09)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-antdv
+
+# [1.16.0](https://github.com/fast-crud/fast-crud/compare/v1.15.1...v1.16.0) (2023-08-07)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-antdv
+
+## [1.15.1](https://github.com/fast-crud/fast-crud/compare/v1.15.0...v1.15.1) (2023-08-05)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-antdv
+
+# [1.15.0](https://github.com/fast-crud/fast-crud/compare/v1.14.7...v1.15.0) (2023-08-05)
+
+### Features
+
+* antdv4 支持 ([1935614](https://github.com/fast-crud/fast-crud/commit/19356142cda925d1248fe7c84c18cb8324ce5f70))
+
+### Performance Improvements
+
+* 适配antdv4样式 ([1108f58](https://github.com/fast-crud/fast-crud/commit/1108f5874a5369cbdb6f015264327ea8a879da61))
+
+## [1.14.7](https://github.com/fast-crud/fast-crud/compare/v1.14.6...v1.14.7) (2023-07-24)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-antdv
+
+## [1.14.6](https://github.com/fast-crud/fast-crud/compare/v1.14.5...v1.14.6) (2023-07-23)
+
+### Bug Fixes
+
+* 修复element 版 search select组件右边超出显示的问题 ([ff11cf4](https://github.com/fast-crud/fast-crud/commit/ff11cf4f9c6ac63d997b5cad2067123c01cd299b))
+
 ## [1.14.5](https://github.com/fast-crud/fast-crud/compare/v1.14.4...v1.14.5) (2023-07-04)
 
 ### Bug Fixes

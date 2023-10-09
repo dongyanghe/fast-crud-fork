@@ -375,6 +375,12 @@ export type RemoveProps = {
    */
   onRemoved?: (context: any) => Promise<any>;
 
+  /**
+   * 实际删除操作
+   * @param context
+   */
+  handle?: (context: any) => Promise<any>;
+
   [key: string]: any;
 };
 
@@ -449,6 +455,11 @@ export type FormWrapperProps = {
    * 对话框使用什么组件，[el-dialog,a-modal,n-modal,el-drawer,a-drawer,n-drawer]
    */
   is?: string;
+
+  /**
+   * 是否支持拖拽
+   */
+  draggable?: boolean;
   /**
    * 对话框打开前事件处理
    * @param opts
@@ -541,6 +552,11 @@ export type FormProps = {
    * 可以配置跨列 {span:24}表示此字段占满一行
    */
   col?: ColProps;
+
+  /**
+   * a-row的配置
+   */
+  row?: any;
   /**
    * 字段组件之前render
    * @param scope
@@ -555,19 +571,27 @@ export type FormProps = {
    * 表单对话框/抽屉配置
    */
   wrapper?: FormWrapperProps;
+
+  /**
+   * 提交前做一些操作,返回false或抛异常，阻止后续操作
+   */
+  beforeSubmit?: (context: FormScopeContext) => Promise<boolean>;
+
   /**
    * 提交表单的方法（默认已经配置好，将会调用addRequest或者updateRequest）
    */
   doSubmit?: (context: FormScopeContext) => Promise<any>;
   /**
-   * 提交前做一些操作
-   */
-  beforeSubmit?: (context: FormScopeContext) => Promise<any>;
-  /**
-   * 提交后做一些操作
+   * 提交后做一些操作，可以抛异常来阻止后续操作，其中context.res = doSubmit的返回值
    * @param context
    */
   afterSubmit?: (context: FormScopeContext) => Promise<any>;
+
+  /**
+   * 成功后的操作，afterSubmit未抛异常时执行，默认为刷新表格
+   * @param context
+   */
+  onSuccess?: (context: FormScopeContext) => Promise<any>;
 
   /**
    * 表单重置时的操作
@@ -745,6 +769,18 @@ export type ContainerProps = {
 };
 
 export type ColumnsFilterComponentProps = {
+  /**
+   * 布局容器组件配置
+   */
+  container?: {
+    is?: string | ShallowRef;
+    [key: string]: any;
+  };
+
+  /**
+   * 列配置组件名称
+   */
+  is?: string | ShallowRef;
   /**
    * 是否显示列设置抽屉
    */
@@ -934,7 +970,7 @@ export type ActionbarProps = {
   [key: string]: any;
 };
 
-export type SearchEventContext = { form: any; getComponentRef?: (key: string) => any };
+export type SearchEventContext = { form: any; validatedForm: any; getComponentRef?: (key: string) => any };
 /**
  * 查询框配置
  */
@@ -943,6 +979,16 @@ export type SearchProps = {
    * 是否显示查询框
    */
   show?: boolean;
+
+  /**
+   * 初始化查询表单数据，reset会还原成此对象
+   */
+  initialForm?: Record<string, any>;
+
+  /**
+   * 校验成功后的表单数据，无需手动配置
+   */
+  validatedForm?: Record<string, any>;
   /**
    * 查询框的按钮配置（查询和重置按钮，你还可以添加自定义按钮）
    */
@@ -1011,7 +1057,7 @@ export type SearchItemProps = {
   col?: ColProps;
 
   /**
-   * 此字段是否开启触发自动查询, 传入string则表示，[input,change]事件时触发
+   * 此字段是否开启触发自动查询, 传入string则表示，[input,change,enter]事件时触发
    */
   autoSearchTrigger?: boolean | string;
   /**
@@ -1257,6 +1303,7 @@ export type CrudOptions = {
 type CrudSetting = {
   viewFormUseCellComponent?: boolean;
   searchCopyFormProps?: string[];
+  onUseCrud?: (bindings: CrudBinding) => void;
 };
 type CrudMode = {
   /**

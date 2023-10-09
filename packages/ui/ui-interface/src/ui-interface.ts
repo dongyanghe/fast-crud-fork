@@ -59,6 +59,7 @@ export type SelectBuilderOption = {
 export interface SelectCI extends CI<SelectBuilderOption> {
   modelValue: string;
   clearable: string;
+  buildMultiBinding: (multiple: boolean) => ComponentBinding;
 }
 
 export type OptionBuilderOption = {} & BindBuilderOptions;
@@ -124,6 +125,8 @@ export type DialogFooterBuilder = (footer?: any) => ComponentBinding;
 export type DialogOnClosedBindBuilder = (onClose: (visible: boolean) => void) => ComponentBinding;
 
 export type DialogBuilderOption = {
+  title?: string;
+  width?: string;
   footer?: UiSlot;
   customClass?: string;
 } & BindBuilderOptions;
@@ -145,6 +148,7 @@ export interface DialogCI extends CI<DialogBuilderOption> {
   footer: DialogFooterBuilder;
   buildOnClosedBind: DialogOnClosedBindBuilder;
   customClass: string;
+  footerSlotName?: string;
   titleSlotName?: string;
   buildWidthBind?: (width: any) => ComponentBinding;
   buildInitBind?: () => ComponentBinding;
@@ -192,6 +196,22 @@ export type TableSorterContext = {
   asc: boolean;
 };
 export type TableBuilderOption = {} & BindBuilderOptions;
+export type TableScrollReq = { top: number; tableRef: any; fsTableRef: any };
+export type TableSetSelectedRows = {
+  selectedRowKeys: Ref<any[]>;
+  data?: any[];
+  tableRef: any;
+  multiple: boolean;
+  getRowKey: any;
+};
+export type TableSelectionReq = {
+  crossPage: boolean;
+  getRowKey?: () => any;
+  getPageData?: () => any[];
+  multiple: boolean;
+  selectedRowKeys: Ref<any[]>;
+  onSelectedKeysChanged: (selectedRowKeys: any[]) => void;
+};
 export interface TableCI extends CI<TableBuilderOption> {
   defaultRowKey?: string | ((rowData: any) => any);
   data: string;
@@ -213,6 +233,11 @@ export interface TableCI extends CI<TableBuilderOption> {
    * render 方法触发时的参数构建出一个scope
    */
   rebuildRenderScope?: (scope: any, prop2?: any, prop3?: any, prop4?: any) => ComponentBinding;
+
+  scrollTo(req: TableScrollReq): void;
+
+  buildSelectionBinding(req: TableSelectionReq): ComponentBinding;
+  setSelectedRows?: (req: TableSetSelectedRows) => void;
 }
 
 export type CheckboxGroupBuilderOption = {} & BindBuilderOptions;
@@ -347,6 +372,7 @@ export interface FormItemCI extends CI {
   label: string;
   rules: string;
   injectFormItemContext: () => FsUiFormItemContext;
+  skipValidationWrapper: string;
 }
 
 export interface TooltipCI extends CI {

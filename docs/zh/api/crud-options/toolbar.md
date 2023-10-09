@@ -59,18 +59,46 @@ const crudOptions = {
             server:()=>Promise<void>, // 服务端导出方法，配置则开启服务端导出，本地导出则不生效
             //以下为本地导出配置
             columns:  null, // 导出的列配置，不配置则导出全部，类型为 {key:string,title:string}[],
-            noHeader: false, // 是否不需要表头
+            noHeader: false, // 是否不需要表头，仅csv
             filename: 'table', // 导出文件名
-            fileType: 'csv' ,// 导出文件类型，可选值：csv | excel
+            fileType: 'csv' ,// 导出文件类型，可选值：csv | excel=数据比较复杂时使用（包含逗号，换行等）
+            dataFrom: 'local', //导出数据来源，可选值：local=本地页面数据 | search=导出前请求接口获取数据
+            searchParams: { //当dataFrom=search时，导出前请求接口获取数据的参数
+                //查询条件
+                page: {
+                    currentPage: 1,
+                    pageSize: 99999999
+                }
+                // 如果以下参数不传，以当前查询条件为准
+                // form: {},
+                // sort: {}
+            },
             merge: [], // excel 合并单元格配置,仅excel生效
             dataFormatter: (opts:DataFormatterContext)=>{
-                //自定义修改导出数据
-                // DataFormatterContext = {row: any,originalRow: any, key: string, col: ColumnProps}
+                //自定义修改导出数据展示值
+                if(opts.col.key === 'name'){
+                    //例如： 给名字值后面加星号
+                    return opts.col.name +"※"
+                }
+                //参数说明
+                // DataFormatterContext = {row: any,originalRow: any, key: string, col: ColumnProps, exportCol:ExportColumn}
                 // row = 当前行数据
                 // originalRow = 当前行原始数据
                 // key = 当前列的key
                 // col = 当前列的配置
+                // exportCol = 当前列的导出配置
             } ,
+            columnFilter: (col:ColumnProps)=>{
+                //列过滤器，返回true则导出该列
+                //例如： 只导出show=true的列
+                return col.show ===true
+            },
+            onlyShow:boolean, //仅导出当前显示的列，与上面的配置效果相同
+            columnBuilder: ({col:ExportColumn})=>{
+                //列构建器，调整列宽
+                col.width = 100
+            },
+            
         }
     }
 }
@@ -106,3 +134,10 @@ crudBinding.value.toolbar.columnsFilter.originalColumns[2].columnSetShow = false
 crudBinding.value.toolbar.columnsFilter.originalColumns[2].columnSetDisabled = true
 
 ```
+
+## columnsFilter.container
+* 说明：自定义列设置布局
+* 类型：`{is：string|ShallowRef}`
+* 默认值： `{is:"fs-columns-filter-layout-default"}`
+* 布局参考： [fs-columns-filter-layout-default](https://github.com/fast-crud/fast-crud/blob/main/packages/fast-crud/src/components/toolbar/fs-table-columns-filter/fs-columns-filter-layout-default.vue)
+* 关键： 通过 `inject(ColumnsFilterProvideKey)`获取 `ColumnsFilterContext`, 修改currentColumns内每个列的show值即可

@@ -1,10 +1,10 @@
 import _ from "lodash-es";
 import { useMerge } from "./use-merge";
 import logger from "../utils/util.log";
-import { reactive, shallowReactive, UnwrapRef } from "vue";
-import LRU from "lru-cache";
-import { UnwrapNestedRefs } from "vue";
-const DictGlobalCache = new LRU<string, any>({
+import { nextTick, shallowReactive, UnwrapNestedRefs } from "vue";
+import { LRUCache } from "lru-cache";
+
+const DictGlobalCache = new LRUCache<string, any>({
   max: 500,
   maxSize: 5000,
   ttl: 1000 * 60 * 30,
@@ -65,7 +65,7 @@ export interface DictOptions<T> {
    */
   isTree?: boolean;
   /**
-   * 是否全局缓存
+   * 是否全局缓存， 建议将dict()实例放到全局文件中引用，相当于store，也可达到全局缓存的效果
    */
   cache?: boolean; // 获取到结果是否进行全局缓存
   /**
@@ -83,10 +83,10 @@ export interface DictOptions<T> {
   immediate?: boolean; //是否立即请求
 
   /**
-   * 根据values 远程获取字典，prototype=true时有效
+   * 根据values 远程获取字典
    * @param values
    */
-  getNodesByValues?: (values: any, options?: LoadDictOpts) => Promise<T[]>;
+  getNodesByValues?: (values: any[], options?: LoadDictOpts) => Promise<T[]>;
 
   /**
    * dict数据远程加载完后触发
@@ -106,7 +106,6 @@ export interface DictOptions<T> {
 export type LoadDictOpts = {
   reload?: boolean;
   value?: any;
-
   [key: string]: any;
 };
 
@@ -147,7 +146,6 @@ export class Dict<T = any> extends UnMergeable implements DictOptions<T> {
   loading = false;
   custom = {};
   getNodesByValues?: (values: any, options?: LoadDictOpts) => Promise<T[]>;
-  cacheNodes = {};
   onReady?: (context: DictOnReadyContext) => void = undefined;
   notifies: Array<any> = []; //loadDict成功后的通知
   constructor(dict: DictOptions<T>) {
@@ -193,26 +191,15 @@ export class Dict<T = any> extends UnMergeable implements DictOptions<T> {
     }
 
     if (this.loading) {
-      let notify: SuccessNotify = null;
-      //如果正在加载中，则等待加载完成
-      const ret: Promise<any[]> = new Promise((resolve) => {
-        notify = (data: any[]) => {
-          resolve(data);
-        };
-      });
-      if (!this.notifies) {
-        this.notifies = [];
-      }
-      this.notifies.push(notify);
-      return ret;
+      return this._registerNotify();
     }
 
     let data: any[] = null;
     if (this.getNodesByValues) {
-      if (!this.prototype) {
-        logger.warn("您配置了getNodesByValues，根据value值获取节点数据需要dict.prototype=true");
-        return [];
-      }
+      // if (!this.prototype) {
+      //   logger.warn("您配置了getNodesByValues，根据value值获取节点数据需要dict.prototype=true");
+      //   return [];
+      // }
 
       if (context.value) {
         let cacheKey = null;
@@ -228,7 +215,8 @@ export class Dict<T = any> extends UnMergeable implements DictOptions<T> {
         if (cached) {
           data = cached;
         } else {
-          data = await this.getNodesByValues(context.value, context);
+          const value = Array.isArray(context.value) ? context.value : [context.value];
+          data = await this.getNodesByValues(value, context);
           if (cacheKey) {
             DictGlobalCache.set(cacheKey, data);
           }
@@ -249,6 +237,10 @@ export class Dict<T = any> extends UnMergeable implements DictOptions<T> {
       this.onReady({ dict: this, ...context });
     }
     // notify
+    this._triggerNotify();
+  }
+
+  private _triggerNotify() {
     if (this.notifies && this.notifies.length > 0) {
       _.forEach(this.notifies, (call) => {
         call(this.data);
@@ -257,16 +249,75 @@ export class Dict<T = any> extends UnMergeable implements DictOptions<T> {
     }
   }
 
+  private _registerNotify() {
+    let notify: SuccessNotify = null;
+    //如果正在加载中，则等待加载完成
+    const ret: Promise<any[]> = new Promise((resolve) => {
+      notify = (data: any[]) => {
+        resolve(data);
+      };
+    });
+    if (!this.notifies) {
+      this.notifies = [];
+    }
+    this.notifies.push(notify);
+    return ret;
+  }
+
   /**
    * 加载字典
    * @param context 当prototype=true时会传入
    */
-  async loadDict(context?: any) {
-    return this._loadDict({ ...context });
+  async loadDict(context?: LoadDictOpts) {
+    return await this._loadDict({ ...context });
   }
 
-  async reloadDict(context?: any) {
-    return this.loadDict({ ...context, reload: true });
+  async reloadDict(context?: LoadDictOpts) {
+    return await this.loadDict({ ...context, reload: true });
+  }
+
+  _unfetchValues: Record<any, { loading: boolean; value: any }> = {};
+  /**
+   * 根据value获取nodes 追加数据
+   * @param values
+   */
+  async appendByValues(values: any[]) {
+    if (this.getNodesByValues == null) {
+      logger.warn("请配置getNodesByValues");
+      return;
+    }
+    for (const v of values) {
+      if (this.dataMap[v] || this._unfetchValues[v]) {
+        continue;
+      }
+      this._unfetchValues[v] = {
+        loading: false,
+        value: v
+      };
+    }
+    await nextTick();
+    await nextTick();
+    await nextTick();
+    const toFetchValues: any[] = [];
+    _.forEach(this._unfetchValues, (v) => {
+      if (!v.loading) {
+        v.loading = true;
+        toFetchValues.push(v.value);
+      }
+    });
+    if (toFetchValues.length > 0) {
+      const data = await this.getNodesByValues(toFetchValues);
+      this.setData([...(this.data || []), ...data]);
+      for (const key of toFetchValues) {
+        delete this._unfetchValues[key];
+      }
+      if (Object.keys(this._unfetchValues).length === 0) {
+        this._triggerNotify();
+      }
+      return this.data;
+    } else {
+      return this._registerNotify();
+    }
   }
 
   clear() {
