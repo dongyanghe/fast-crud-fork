@@ -1,7 +1,7 @@
 import _ from "lodash-es";
 import { useMerge } from "./use-merge";
 import logger from "../utils/util.log";
-import { nextTick, shallowReactive, UnwrapNestedRefs } from "vue";
+import { isShallow, nextTick, shallowReactive, UnwrapNestedRefs } from "vue";
 import { LRUCache } from "lru-cache";
 
 const DictGlobalCache = new LRUCache<string, any>({
@@ -34,7 +34,7 @@ export type DictGetData<T> = (context?: any) => Promise<T[]>;
 /**
  * Dict参数
  */
-export interface DictOptions<T> {
+export interface DictOptions<T = any> {
   /**
    * dict请求url
    */
@@ -240,7 +240,7 @@ export class Dict<T = any> extends UnMergeable implements DictOptions<T> {
     this._triggerNotify();
   }
 
-  private _triggerNotify() {
+  _triggerNotify() {
     if (this.notifies && this.notifies.length > 0) {
       _.forEach(this.notifies, (call) => {
         call(this.data);
@@ -249,7 +249,7 @@ export class Dict<T = any> extends UnMergeable implements DictOptions<T> {
     }
   }
 
-  private _registerNotify() {
+  _registerNotify() {
     let notify: SuccessNotify = null;
     //如果正在加载中，则等待加载完成
     const ret: Promise<any[]> = new Promise((resolve) => {
@@ -321,8 +321,8 @@ export class Dict<T = any> extends UnMergeable implements DictOptions<T> {
   }
 
   clear() {
-    this.data = null;
-    this.dataMap = {};
+    this.originalData = null;
+    this.setData(null);
   }
 
   async getRemoteDictData(context?: any) {
@@ -397,9 +397,13 @@ export class Dict<T = any> extends UnMergeable implements DictOptions<T> {
   }
 
   toMap() {
+    if (this._data == null) {
+      this.dataMap = {};
+      return;
+    }
     const map = {};
     if (this.data) {
-      this.buildMap(map, this.data);
+      this.buildMap(map, this.data || []);
     }
     // if (this.getNodesByValues) {
     //   _.merge(this.dataMap, map);

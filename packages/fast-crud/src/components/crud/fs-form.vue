@@ -97,10 +97,11 @@ import {
   ref,
   toRaw,
   unref,
-  UnwrapNestedRefs
+  UnwrapNestedRefs,
+  watch
 } from "vue";
 import _ from "lodash-es";
-import { useCompute } from "../../use/use-compute";
+import { ComputeValue, useCompute } from "../../use/use-compute";
 import logger from "../../utils/util.log";
 import { useMerge } from "../../use/use-merge";
 import { Constants } from "../../utils/util.constants";
@@ -246,60 +247,61 @@ export default defineComponent({
     const formRef = ref();
     const form: UnwrapNestedRefs<any> = reactive({});
     const { proxy } = getCurrentInstance();
-    // eslint-disable-next-line vue/no-setup-props-destructure
-    const initialForm = _.cloneDeep(props.initialForm);
 
     // eslint-disable-next-line vue/no-setup-props-destructure
-    const scope: Ref<FormScopeContext> = ref({
-      row: initialForm,
-      form,
-      index: props.index,
-      mode: props.mode,
-      attrs: ctx.attrs,
-      getComponentRef
-    } as FormScopeContext);
+    _.each(props.columns, (item) => {
+      if (item.value != null && (item.value instanceof AsyncComputeValue || item.value instanceof ComputeValue)) {
+        logger.warn("form.value配置不支持Compute/AsyncCompute类型的动态计算");
+      }
+    });
+
+    function createInitialForm() {
+      const form = _.cloneDeep(props.initialForm);
+
+      // 初始数据赋值
+      _.each(props.columns, (item, key) => {
+        const defValue = unref(item.value);
+        if (defValue !== undefined) {
+          _.set(form, key, defValue);
+        }
+      });
+      return form;
+    }
+
+    const initialForm = createInitialForm();
+    setFormData(initialForm);
+
+    const scope: Ref<FormScopeContext> = computed(() => {
+      return {
+        row: initialForm,
+        form,
+        index: props.index,
+        mode: props.mode || "add",
+        attrs: ctx.attrs,
+        getComponentRef
+      } as FormScopeContext;
+    });
 
     function getContextFn() {
       return scope.value;
     }
 
-    // eslint-disable-next-line vue/no-setup-props-destructure
-    _.each(props.columns, (item) => {
-      if (item.value != null && item.value instanceof AsyncComputeValue) {
-        logger.warn("form.value配置不支持AsyncCompute类型的动态计算");
-      }
-    });
-
     const computedColumns = doComputed(() => {
       return props.columns;
     }, getContextFn);
-
-    // 初始数据赋值
-    _.each(computedColumns.value, (item, key) => {
-      _.set(form, key, undefined);
-      const defValue = unref(item.value);
-      if (defValue !== undefined) {
-        _.set(form, key, defValue);
-      }
-      if (initialForm) {
-        const value = _.get(initialForm, key);
-        if (value != null) {
-          _.set(form, key, value);
-        }
-      }
-    });
     //form.valueBuilder
+
     function doValueBuilder(form: any) {
       if (form == null) {
         return;
       }
-      _.each(computedColumns.value, (item, key) => {
+      _.each(props.columns, (item, key) => {
         let value = _.get(form, key);
         if (item.valueBuilder) {
           item.valueBuilder({
             value,
             key,
-            row: props.initialForm,
+            row: initialForm,
             form,
             index: props.index,
             mode: props.mode
@@ -308,7 +310,43 @@ export default defineComponent({
       });
     }
 
+    function getFormData() {
+      return form;
+    }
+    function setFormData(formData: any, options: SetFormDataOptions = {}) {
+      doValueBuilder(formData);
+
+      if (options.mergeForm === false) {
+        for (const key in form) {
+          delete form[key];
+        }
+      }
+      merge(form, formData);
+      const { valueChange } = options;
+      if (valueChange) {
+        _.forEach(props.columns, (column, key) => {
+          const value = form[key];
+          doValueChange(key, value);
+        });
+      }
+    }
+
+    function mergeCol(...col: any) {
+      return merge({}, props.col, ...col);
+    }
+
+    function buildItemScope(item: any): FormScopeContext {
+      return { key: item.key, ...scope.value };
+    }
+
     doValueBuilder(form);
+
+    // watch(
+    //   () => props.initialForm,
+    //   () => {
+    //     setFormData(createInitialForm(), { mergeForm: false });
+    //   }
+    // );
 
     function doValueChange(key: string, value: any) {
       const event = { key, value, formRef: proxy, ...scope.value, immediate: false };
@@ -341,6 +379,7 @@ export default defineComponent({
         groupActiveKey.value.push(key);
       }
     });
+    // eslint-disable-next-line vue/no-setup-props-destructure
     if (props.group?.groupType === "tabs") {
       groupActiveKey.value = groupActiveKey.value.length > 0 ? groupActiveKey.value[0] : null;
     }
@@ -413,12 +452,10 @@ export default defineComponent({
     function getFormRef() {
       return formRef.value;
     }
-    function createInitialForm() {
-      return _.cloneDeep(props.initialForm || {});
-    }
     async function reset() {
       // ui.form.resetWrap(formRef.value, { form, initialForm: createInitialForm() });
       const initialForm = createInitialForm();
+      debugger;
       const entries = _.entries(form);
       for (const entry of entries) {
         const initialValue = _.get(initialForm, entry[0]);
@@ -480,7 +517,7 @@ export default defineComponent({
       if (props.beforeSubmit) {
         const ret = await props.beforeSubmit(submitScope);
         if (ret === false) {
-          return;
+          return false;
         }
       }
 
@@ -494,35 +531,18 @@ export default defineComponent({
       if (props.doSubmit) {
         const res = await props.doSubmit(submitScope);
         submitScope.res = res;
+        if (res === false) {
+          return false;
+        }
       }
       ctx.emit("submit", submitScope);
       if (props.afterSubmit) {
-        await props.afterSubmit(submitScope);
+        const success = await props.afterSubmit(submitScope);
+        if (success === false) {
+          return false;
+        }
       }
       ctx.emit("success", submitScope);
-    }
-
-    function getFormData() {
-      return form;
-    }
-    function setFormData(formData: any, options: SetFormDataOptions = {}) {
-      doValueBuilder(formData);
-      merge(form, formData);
-      const { valueChange } = options;
-      if (valueChange) {
-        _.forEach(props.columns, (column, key) => {
-          const value = form[key];
-          doValueChange(key, value);
-        });
-      }
-    }
-
-    function mergeCol(...col: any) {
-      return merge({}, props.col, ...col);
-    }
-
-    function buildItemScope(item: any): FormScopeContext {
-      return { key: item.key, ...scope.value };
     }
 
     onMounted(() => {
@@ -612,10 +632,13 @@ export default defineComponent({
 
   .fs-form-item-component {
     .ant-picker,
+    .ant-input-affix-wrapper,
     .ant-input-number,
     .el-cascader,
     .el-date-editor,
     .el-input-number,
+    .el-input,
+    .el-select,
     .n-select,
     .n-date-picker,
     .n-input-number {

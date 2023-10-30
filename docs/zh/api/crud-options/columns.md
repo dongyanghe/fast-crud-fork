@@ -140,7 +140,7 @@ crudOptions = { //
 
 
 ## [key].column.formatter
-* 说明：格式化显示
+* 说明：格式化显示，此参数与antdv、element的原始属性名重叠，非特殊列以此为准。
 * 类型：Function(context):String
 
 ## [key].column.order
@@ -506,6 +506,7 @@ const crudOptions = {
         key:{
             search:{
                 labelWidth:200 //配置查询框的label宽度(此字段仅限element-plus,其他ui请查阅对应ui的文档)
+                //... 更多配置，请阅读对应组件的文档
             }
         }
     }

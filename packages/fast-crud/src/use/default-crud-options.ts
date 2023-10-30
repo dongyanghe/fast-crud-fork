@@ -1,6 +1,5 @@
 import { uiContext } from "../ui";
-import { UseCrudProps } from "../use/use-crud";
-import { CrudOptions } from "../d";
+import { CrudOptions, UseCrudProps } from "../d";
 export default {
   commonOptions(ctx?: UseCrudProps): any {
     return {};
@@ -111,7 +110,8 @@ export default {
         border: true,
         bordered: true,
         singleLine: false, //naive
-        editable: { enabled: false }
+        editable: { enabled: false },
+        pagination: false //antdv 关闭默认分页
       },
       toolbar: {
         compact: true

@@ -1,4 +1,12 @@
+import { SearchPlugin } from "vitepress-plugin-search";
+//default options
+
 module.exports = {
+    // vite:{
+    //     ssr: {
+    //         noExternal: ['segmentit']
+    //     }
+    // },
     title: 'FastCrud',
     description: '面向配置的CRUD编程.',
     //Add a wildcard at the end of the search
@@ -20,12 +28,33 @@ module.exports = {
 
     themeConfig: {
         logo: '/images/logo.svg',
-        algolia: {
-            appId: 'MS0LML0LJG',
-            apiKey: 'f84fe913d9e34f1c1427e69a64152c2d',
-            indexName: 'crawler_fast-crud',
-            schedule: 'every 1 day at 3:00 pm',
+        search:{
+            provider: 'local',
+            options:{
+                detailedView: true,
+                translations:{
+                    button:{
+                        buttonText: '搜索文档',
+                        buttonAriaLabel: '搜索文档'
+                    },
+                    modal: {
+                        noResultsText: '无法找到相关结果',
+                        resetButtonTitle: '清除查询条件',
+                        footer: {
+                            selectText: '选择',
+                            closeText: '关闭',
+                            navigateText: '切换'
+                        }
+                    }
+                }
+            }
         },
+        // algolia: {
+        //     appId: 'MS0LML0LJG',
+        //     apiKey: 'f84fe913d9e34f1c1427e69a64152c2d',
+        //     indexName: 'crawler_fast-crud',
+        //     schedule: 'every 1 day at 3:00 pm',
+        // },
         // search: true,
         sidebar: {
             '/guide/': [
@@ -152,6 +181,7 @@ module.exports = {
                                 {text: 'fs-iconify', link: "/api/components/crud/basic/fs-iconify"},
                                 {text: 'fs-icon-svg', link: "/api/components/crud/basic/fs-icon-svg"},
                                 {text: 'fs-loading', link: "/api/components/crud/basic/fs-loading"},
+                                {text: 'fs-label', link: "/api/components/crud/basic/fs-label"},
                                 {text: 'fs-render', link: "/api/components/crud/render/fs-render"},
                                 {text: 'fs-slot-render', link: "/api/components/crud/render/fs-slot-render"},
                                 {text: 'fs-component-render', link: "/api/components/crud/render/fs-component-render"},
@@ -245,6 +275,14 @@ module.exports = {
                                         {
                                             text: "fs-copyable",
                                             link: '/api/components/extends/copyable/components/fs-copyable'
+                                        }
+                                    ]
+                                },
+                                {
+                                    text: 'Time', items: [
+                                        {
+                                            text: "fs-time-humanize",
+                                            link: '/api/components/extends/time/components/fs-time-humanize'
                                         }
                                     ]
                                 }

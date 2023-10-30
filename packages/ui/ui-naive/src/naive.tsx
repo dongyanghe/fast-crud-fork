@@ -37,6 +37,7 @@ import {
   PaginationCI,
   PopoverCI,
   ProgressCI,
+  RadioButtonCI,
   RadioCI,
   RadioGroupCI,
   RowCI,
@@ -492,7 +493,26 @@ export class Naive implements UiInterface {
 
   radio: RadioCI = creator<RadioCI>({
     name: "n-radio",
-    value: "value"
+    value: "value",
+    builder(opts) {
+      return buildBinding(this, opts, {
+        props: {
+          [this.value]: opts.value
+        }
+      });
+    }
+  });
+
+  radioButton: RadioButtonCI = creator<RadioButtonCI>({
+    name: "n-radio-button",
+    value: "value",
+    builder(opts) {
+      return buildBinding(this, opts, {
+        props: {
+          [this.value]: opts.value
+        }
+      });
+    }
   });
 
   radioGroup: RadioGroupCI = creator<RadioGroupCI>({
@@ -545,8 +565,8 @@ export class Naive implements UiInterface {
     scrollTo(req: TableScrollReq) {
       req.tableRef.value.scrollTo({ top: req.top });
     },
-    buildSelectionBinding(req) {
-      const onSelectionChange = (changed: any) => {
+    buildSelectionCrudOptions(req) {
+      const onSelectionChange = (changed: any = []) => {
         req.onSelectedKeysChanged(changed);
       };
 

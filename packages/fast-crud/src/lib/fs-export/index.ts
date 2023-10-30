@@ -1,29 +1,25 @@
 import _ from "lodash-es";
-import { ColumnCompositionProps, ColumnProps, CrudExpose, PageQuery } from "../../d";
+import { ColumnCompositionProps, ColumnProps, CrudExpose, PageQuery, UserPageQuery } from "../../d";
 import { CsvParams, ExcelParams, ExportColumn, ExportUtil, ImportUtil } from "./lib/d";
 import { unref } from "vue";
 
 export async function loadFsExportUtil(): Promise<ExportUtil> {
   const module = await import.meta.glob("./lib/index.ts");
-  console.log("module", module);
   let target: any = null;
   _.each(module, (item) => {
     target = item;
   });
   const lib = await target();
-  console.log("lib", lib);
   return lib.exportUtil;
 }
 
 export async function loadFsImportUtil(): Promise<ImportUtil> {
   const module = await import.meta.glob("./lib/index.ts");
-  console.log("module", module);
   let target: any = null;
   _.each(module, (item) => {
     target = item;
   });
   const lib = await target();
-  console.log("lib", lib);
   return lib.importUtil;
 }
 
@@ -58,7 +54,7 @@ export type ExportProps = {
   /**
    * 服务端导出，自己实现
    */
-  server?: () => Promise<void>;
+  server?: (pageQuery: UserPageQuery) => Promise<void>;
 
   /**
    * 仅导出显示的列
@@ -107,7 +103,9 @@ export type ExportProps = {
   ExcelParams;
 export async function exportTable(crudExpose: CrudExpose, opts: ExportProps = {}): Promise<any> {
   if (opts.server) {
-    await opts.server();
+    const page = crudExpose.getPage();
+    const pageQuery = crudExpose.buildPageQuery({ page });
+    await opts.server(pageQuery);
     return;
   }
   const crudBinding = crudExpose.crudBinding;
@@ -128,16 +126,20 @@ export async function exportTable(crudExpose: CrudExpose, opts: ExportProps = {}
       if (col.exportable !== false && col.key !== "_index") {
         const exportCol: ExportColumn = {
           key: col.key,
-          title: col.title,
-          columnProps: col
+          title: col.title
         };
-        //构建列配置
-        if (opts.columnBuilder) {
-          opts.columnBuilder({ col: exportCol });
-        }
         columns.push(exportCol);
       }
     });
+  }
+
+  for (const exportCol of columns) {
+    //构建列配置
+    const columnProps = crudBinding.value.table.columnsMap[exportCol.key];
+    exportCol.columnProps = columnProps || {};
+    if (opts.columnBuilder) {
+      opts.columnBuilder({ col: exportCol });
+    }
   }
 
   //加载异步组件，不影响首页加载速度
@@ -164,7 +166,7 @@ export async function exportTable(crudExpose: CrudExpose, opts: ExportProps = {}
       const mapping = {
         row: clone,
         originalRow: row,
-        key: col.key,
+        key: exportCol.key,
         col,
         exportCol
       };

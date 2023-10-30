@@ -185,11 +185,18 @@ export default defineComponent({
     async function submit() {
       loading.value = true;
       try {
-        await formRef.value.submit();
+        const success = await formRef.value.submit();
+        if (success === false) {
+          return;
+        }
         close();
       } finally {
         loading.value = false;
       }
+    }
+
+    async function reset() {
+      await formRef.value.reset();
     }
 
     function getFormData() {
@@ -205,6 +212,12 @@ export default defineComponent({
           text: t("fs.form.cancel"),
           onClick: () => {
             close();
+          }
+        },
+        reset: {
+          text: t("fs.form.reset"),
+          onClick: () => {
+            reset();
           }
         },
         ok: {

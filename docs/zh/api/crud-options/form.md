@@ -42,7 +42,7 @@ const crudOptions = {
         // 以下仅element，其他ui的相关配置请看对应ui的form组件文档
         labelPosition: "right", // 标签位置
         labelWidth: "100px", //标签宽度
-        //更多配置请查看对应ui库文档，form表单章节
+        //... 更多配置请查看对应ui库文档，form表单章节
     }
     
 }
@@ -181,20 +181,20 @@ const crudOptions = {
 * 类型：Object
 
 ## beforeSubmit
-* 说明: 表单提交前触发，返回false则中止提交
+* 说明: 表单提交前触发，，返回false或抛异常即可中止提交
 * 类型：async Function(context)
 
 ## doSubmit
-* 说明: 提交表单时执行的方法（独立使用表单时，通过`formRef.submit()`可触发此方法）
+* 说明: 提交表单时执行的方法（独立使用表单时，通过`formRef.submit()`可触发此方法），返回false或抛异常即可阻止后续操作，比如阻止关闭窗口
 * 类型：async Function(context)
 * 默认：默认无需配置，通过`useCrud`自动生成
 
 ## afterSubmit
-* 说明: 表单提交后触发，可以抛异常阻止后续操作
+* 说明: 表单提交后触发，返回false或抛异常即可阻止后续操作，比如阻止关闭窗口
 * 类型：async Function(context)
 
 ## onSuccess
-* 说明: afterSubmit没有抛异常时触发，默认为刷新表格
+* 说明: afterSubmit没有抛异常且没有返回false时触发，默认为刷新表格
 * 类型：async Function(context)
 
 
@@ -219,6 +219,7 @@ const crudOptions = {
   form: {
     wrapper: {
       width: '800px' //antdv对话框的宽度
+      //....更多 fs-form-wrapper，el-dialog，el-drawer，a-modal，a-drawer的配置
     }
   }
 }

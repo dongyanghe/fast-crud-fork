@@ -54,7 +54,8 @@ import {
   ColCI,
   RowCI,
   CardCI,
-  TableScrollReq
+  TableScrollReq,
+  RadioButtonCI
 } from "@fast-crud/ui-interface";
 // @ts-ignore
 import _, { isFunction } from "lodash-es";
@@ -299,7 +300,26 @@ export class Element implements UiInterface {
 
   radio: RadioCI = creator<RadioCI>({
     name: "el-radio",
-    value: "label"
+    value: "label",
+    builder(opts) {
+      return buildBinding(this, opts, {
+        props: {
+          [this.value]: opts.value
+        }
+      });
+    }
+  });
+
+  radioButton: RadioButtonCI = creator<RadioButtonCI>({
+    name: "el-radio-button",
+    value: "label",
+    builder(opts) {
+      return buildBinding(this, opts, {
+        props: {
+          [this.value]: opts.value
+        }
+      });
+    }
   });
 
   radioGroup: RadioGroupCI = creator<RadioGroupCI>({
@@ -437,7 +457,7 @@ export class Element implements UiInterface {
         }
       }
     },
-    buildSelectionBinding(req) {
+    buildSelectionCrudOptions(req) {
       function getCrossPageSelected(curSelectedIds: any[]) {
         const rowKey: any = req.getRowKey();
         const data = req.getPageData();
@@ -454,7 +474,7 @@ export class Element implements UiInterface {
       }
 
       if (req.multiple) {
-        const onSelectionChange = (changedRows: any[]) => {
+        const onSelectionChange = (changedRows: any[] = []) => {
           const rowKey = req.getRowKey();
           let selectedKeys = changedRows.map((item: any) => item[rowKey]);
           if (req.crossPage) {
@@ -483,6 +503,10 @@ export class Element implements UiInterface {
       } else {
         //单选
         const onCurrentChange = (changed: any) => {
+          if (changed == null) {
+            req.onSelectedKeysChanged([]);
+            return;
+          }
           const rowKey = req.getRowKey();
           const selectedKeys = [changed[rowKey]];
           req.onSelectedKeysChanged(selectedKeys);

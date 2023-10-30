@@ -36,9 +36,9 @@
   </div>
 </template>
 <script lang="tsx" setup>
-import { CreateCrudOptions, Dict, useFs, useMerge, useUi } from "../../use";
+import { Dict, useFs, useMerge, useUi } from "../../use";
 import { computed, nextTick, ref, Ref, watch } from "vue";
-import { DynamicallyCrudOptions } from "../../d";
+import { CreateCrudOptions, DynamicallyCrudOptions } from "../../d";
 import _ from "lodash-es";
 // defineOptions({
 //   name: "FsTableSelect"
@@ -61,7 +61,7 @@ type FsTableSelectProps = {
    */
   dict: Dict;
   /**
-   * 选择框配置
+   * 选择框 fs-dict-select配置
    */
   select?: any;
 
@@ -71,7 +71,7 @@ type FsTableSelectProps = {
   dialog?: any;
 
   /**
-   * 当前选中值 values-format配置
+   * 当前选中值 fs-values-format组件 配置
    */
   valuesFormat?: any;
 
@@ -89,7 +89,7 @@ type FsTableSelectProps = {
   crossPage?: boolean; //跨页选中
 
   /**
-   * 可选
+   * 可选,element-plus必传
    */
   rowKey?: string;
 
@@ -119,6 +119,24 @@ const { ui } = useUi();
 const dictSelectRef = ref();
 const valuesFormatRef = ref();
 const dialogOpen = ref(false);
+
+function initSelectedKeys(modelValue: any) {
+  if (modelValue == null || (Array.isArray(modelValue) && modelValue.length == 0)) {
+    selectedRowKeys.value = [];
+  } else {
+    if (props.multiple) {
+      selectedRowKeys.value = modelValue || [];
+    } else {
+      selectedRowKeys.value = [modelValue];
+    }
+    if (props.valueType === "object") {
+      selectedRowKeys.value = selectedRowKeys.value.map((item) => {
+        return props.dict.getValue(item);
+      });
+    }
+  }
+}
+
 const openTableSelect = async () => {
   if (props.disabled || props.readonly || props.select?.disabled || props.select?.readonly) {
     return;
@@ -127,20 +145,7 @@ const openTableSelect = async () => {
     throw new Error("必须配置dict，且必须配置dict.getNodesByValues");
   }
   dialogOpen.value = true;
-  if (props.modelValue == null || (Array.isArray(props.modelValue) && props.modelValue.length == 0)) {
-    selectedRowKeys.value = [];
-  } else {
-    if (props.multiple) {
-      selectedRowKeys.value = props.modelValue || [];
-    } else {
-      selectedRowKeys.value = [props.modelValue];
-    }
-    if (props.valueType === "object") {
-      selectedRowKeys.value = selectedRowKeys.value.map((item) => {
-        return props.dict.getValue(item);
-      });
-    }
-  }
+  initSelectedKeys(props.modelValue);
   await crudExpose.doRefresh();
 };
 
@@ -191,6 +196,7 @@ watch(
     if (value === selectedRowKeys.value) {
       return;
     }
+    initSelectedKeys(value);
     await nextTick();
     await props.dict.appendByValues(selectedRowKeys.value);
     // dictSelectRef.value.reloadDict();
@@ -204,7 +210,7 @@ function getRowKey() {
 const refreshing = ref(false);
 
 const override: DynamicallyCrudOptions = computed(() => {
-  let selectionOptions = ui.table.buildSelectionBinding({
+  let selectionOptions = ui.table.buildSelectionCrudOptions({
     crossPage: props.crossPage,
     getRowKey,
     getPageData() {

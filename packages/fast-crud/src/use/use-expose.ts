@@ -17,6 +17,7 @@ import {
   ColumnCompositionProps,
   CrudBinding,
   DoRemoveContext,
+  Page,
   PageQuery,
   PageRes,
   RemoveProps,
@@ -288,7 +289,13 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
      * {form,mergeForm}
      */
     setSearchFormData(context) {
-      _.merge(crudBinding.value.search.validatedForm, context.form);
+      if (context.mergeForm === false) {
+        for (const key in crudBinding.value.search.validatedForm) {
+          delete crudBinding.value.search.validatedForm[key];
+        }
+      }
+      const { merge } = useMerge();
+      merge(crudBinding.value.search.validatedForm, context.form);
       if (context.triggerSearch) {
         crudExpose.doRefresh();
       }
@@ -301,7 +308,7 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
       return crudRef.value?.getSearchRef();
     },
 
-    async search(pageQuery: PageQuery, options: SearchOptions = {}) {
+    buildPageQuery(pageQuery: PageQuery): UserPageQuery {
       const page = pageQuery.page;
 
       let searchFormData = pageQuery.form;
@@ -323,7 +330,11 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
       if (crudBinding.value.request.transformQuery) {
         userPageQuery = crudBinding.value.request.transformQuery(query);
       }
+      return userPageQuery;
+    },
 
+    async search(pageQuery: PageQuery, options: SearchOptions = {}) {
+      const userPageQuery = crudExpose.buildPageQuery(pageQuery);
       let userPageRes: UserPageRes;
       try {
         if (options.silence !== true) {
@@ -355,24 +366,33 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
       }
       return pageRes;
     },
-    async doRefresh(props?) {
-      if (crudBinding.value.request.pageRequest == null) {
-        return;
-      }
-      logger.debug("do refresh:", props);
-      let page: any;
+    getPage() {
+      let page: Page = {
+        currentPage: 1,
+        pageSize: 10
+      };
       if (crudBinding.value.pagination) {
-        if (props?.goFirstPage) {
-          crudBinding.value.pagination[ui.pagination.currentPage] = 1;
-        }
-
         page = {
           currentPage: crudBinding.value.pagination[ui.pagination.currentPage],
           pageSize: crudBinding.value.pagination.pageSize
         };
       }
+      return page;
+    },
+    async doRefresh(props?) {
+      if (crudBinding.value.request.pageRequest == null) {
+        return;
+      }
+      logger.debug("do refresh:", props);
+      if (crudBinding.value.pagination) {
+        if (props?.goFirstPage) {
+          crudBinding.value.pagination[ui.pagination.currentPage] = 1;
+        }
+      }
+
+      const page = crudExpose.getPage();
       const pageRes = await crudExpose.search({ page }, { silence: props?.silence });
-      const { currentPage = page[ui.pagination.currentPage], pageSize = page.pageSize, total } = pageRes;
+      const { currentPage = page.currentPage || 1, pageSize = page.pageSize, total } = pageRes;
       const { records } = pageRes;
       if (
         records == null ||

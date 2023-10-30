@@ -1,4 +1,13 @@
-import { CompositionColumns, CrudBinding, FormProps, PageQuery, PageRes, RemoveProps } from "./crud";
+import {
+  CompositionColumns,
+  CrudBinding,
+  FormProps,
+  Page,
+  PageQuery,
+  PageRes,
+  RemoveProps,
+  UserPageQuery
+} from "./crud";
 import { Ref } from "vue";
 import { EditableOnEnabledProps } from "../use";
 
@@ -15,6 +24,8 @@ export class SetFormDataOptions {
    * 是否执行valueChange
    */
   valueChange?: boolean;
+
+  mergeForm?: boolean;
 }
 
 export type DoRefreshProps = {
@@ -37,17 +48,18 @@ export type CrudExpose = {
    */
   getFormRef: () => any;
   /**
-   * 获取表单数据
+   * 获取表单数据，仅表单打开时有效
    */
   getFormData: () => any;
 
   /**
-   * 获取表单数据
+   * 设置当前表单数据，仅表单打开时有效
+   *  data: 表单数据
    */
   setFormData: (data: any, options?: SetFormDataOptions) => any;
 
   /**
-   * 获取表单组件实例
+   * 获取表单组件实例，仅表单打开时有效
    * key: 字段key
    * isAsync: 是否异步获取，传true时，此方法返回promise（当组件是异步组件<extends中的组件>时，第一次获取会为空，所以需要异步等待加载完成后才能获取）
    */
@@ -76,6 +88,16 @@ export type CrudExpose = {
    */
   doSearch: (props: DoSearchProps) => Promise<void>;
 
+  /**
+   * 构建page查询参数
+   * @param pageQuery
+   */
+  buildPageQuery(pageQuery: PageQuery): UserPageQuery;
+
+  /**
+   * 获取当前分页参数
+   */
+  getPage(): Page;
   /**
    * 执行搜索，返回页面数据
    * @param pageQuery

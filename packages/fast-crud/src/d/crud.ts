@@ -1,14 +1,101 @@
-import { Ref, ShallowRef } from "vue";
+import { Component, Ref, ShallowRef } from "vue";
 import { ComputeContext } from "./compute";
-import { Dict, GetContextFn } from "../use";
-import { DoRemoveContext } from "../d/expose";
+import { CrudExpose, DoRemoveContext } from "../d/expose";
 
 import { RuleItem } from "async-validator";
 import { UiSlot, UiSlotRet } from "@fast-crud/ui-interface";
 import { ExportProps } from "../lib/fs-export";
+import { Dict, GetContextFn } from "../use";
 
 // export type FsRefValue<T> = T | Ref<T> | ComputedRef<T>;
 // export type FsComputeValue<T> = FsRefValue<T> | ComputeValue<T> | AsyncComputeValue<T>;
+
+export type UseFsRet = {
+  crudRef: Ref;
+  crudBinding: Ref<CrudBinding>;
+  crudExpose: CrudExpose;
+  context: UseFsContext;
+} & UseCrudRet &
+  CreateCrudOptionsRet;
+
+export type UseFsContext = {
+  [key: string]: any;
+};
+
+export type CreateCrudOptionsProps<T = UseFsContext> = {
+  crudExpose: CrudExpose;
+
+  expose?: CrudExpose;
+
+  context: T;
+};
+
+export type CreateCrudOptionsRet = {
+  /**
+   * crudOptions
+   */
+  crudOptions: DynamicallyCrudOptions;
+
+  /**
+   * 自定义返回变量
+   */
+  [key: string]: any;
+};
+
+export type UseFsProps<T = UseFsContext> = {
+  crudRef?: Ref;
+  crudBinding?: Ref<CrudBinding>;
+
+  crudExposeRef?: Ref<CrudExpose>;
+  createCrudOptions: CreateCrudOptions | CreateCrudOptionsAsync;
+  crudOptionsOverride?: DynamicallyCrudOptions;
+  onExpose?: (context: OnExposeContext<T>) => any;
+
+  context?: T;
+};
+export type CreateCrudOptions = (props: CreateCrudOptionsProps) => CreateCrudOptionsRet;
+export type OnExposeContext<T = UseFsContext> = {
+  crudRef: Ref;
+  crudBinding: Ref<CrudBinding>;
+  crudExpose: CrudExpose;
+  context: T;
+};
+
+export type CreateCrudOptionsAsync = (props: CreateCrudOptionsProps) => Promise<CreateCrudOptionsRet>;
+
+export type UseCrudProps<T = UseFsContext> = {
+  crudOptions: DynamicallyCrudOptions;
+  /**
+   * 即将废弃，请使用crudExpose
+   */
+  expose?: CrudExpose;
+  crudExpose: CrudExpose;
+
+  context: T;
+  /**
+   * 自定义参数
+   * common里面可以使用
+   */
+  [key: string]: any;
+};
+
+export type UseCrudRet = {
+  /**
+   * 重新设置crudOptions
+   * @param overOptions
+   */
+  resetCrudOptions: (options: DynamicType<CrudOptions>) => void;
+  /**
+   * 覆盖crudOptions配置
+   * @param overOptions
+   */
+  appendCrudOptions: (options: DynamicType<CrudOptions>) => DynamicType<CrudOptions>;
+  /**
+   * 追加配置,注意是覆盖crudBinding的结构，而不是crudOptions的结构
+   * @param overBinding
+   */
+  appendCrudBinding: (overBinding: CrudBinding) => void;
+};
 
 export type RowContext = {
   /**
@@ -66,6 +153,13 @@ export type ComponentRenderContext = {
 } & ScopeContext;
 
 export type FormScopeContext = {
+  /**
+   * 初始form数据
+   */
+  initialForm: any;
+  /**
+   * 属性
+   */
   attrs: any;
   /**
    * 提交成功后的response
@@ -274,7 +368,7 @@ export type ComponentProps = {
   /**
    * 组件的名称
    */
-  name?: string | ShallowRef;
+  name?: string | Component;
   /**
    * vmodel绑定的目标属性名
    */
@@ -391,6 +485,27 @@ export type ConditionalRenderProps = {
 
 export type CellConditionalRender = ConditionalRenderProps;
 
+export type RowSelectionProps = {
+  /**
+   * 是否多选
+   */
+  multiple?: boolean; //单选还是多选
+  /**
+   * 跨页选中
+   */
+  crossPage?: boolean; //跨页选中
+
+  /**
+   * 选中值变化事件
+   * @param selectedRowKeys
+   */
+  onSelectedChanged?: (selectedRowKeys: any[]) => void;
+
+  /**
+   * 选中的id列表
+   */
+  selectedRowKeys?: Ref<any[]>;
+};
 /**
  * 表格配置
  */
@@ -434,6 +549,7 @@ export type TableProps = {
    * 表格最大高度调整
    */
   maxHeightAdjust?: number;
+
   /**
    * [x]-table组件的配置
    */
@@ -767,15 +883,16 @@ export type ContainerProps = {
   is?: string | ShallowRef;
   [key: string]: any;
 };
+export type ColumnsFilterContainerProps = {
+  width?: string;
+  drawer?: any;
+};
 
 export type ColumnsFilterComponentProps = {
   /**
    * 布局容器组件配置
    */
-  container?: {
-    is?: string | ShallowRef;
-    [key: string]: any;
-  };
+  container?: ContainerProps & ColumnsFilterContainerProps;
 
   /**
    * 列配置组件名称
@@ -1290,6 +1407,38 @@ export type CompositionColumns = {
   [prop: string]: ColumnCompositionProps;
 };
 
+export type CrudOptionsPluginHandle<T = any> = (props: T, ctx: UseCrudProps) => CrudOptions;
+export type CrudOptionsPlugin<T> = {
+  /**
+   * 是否启用,默认启用
+   */
+  enabled?: boolean;
+  /**
+   * 插件参数
+   */
+  props?: T;
+  /**
+   * 插件顺序
+   */
+  order?: number;
+  /**
+   * 合并在用户的CrudOptions之前还是之后
+   */
+  before?: boolean;
+  /**
+   * 插件处理器
+   */
+  handle?: CrudOptionsPluginHandle<T>;
+};
+
+export type CrudOptionsPlugins = {
+  /**
+   * 行选择插件
+   */
+  rowSelection?: CrudOptionsPlugin<RowSelectionProps>;
+  [key: string]: CrudOptionsPlugin<any>;
+};
+
 /**
  * crud配置
  */
@@ -1300,12 +1449,16 @@ export type CrudOptions = {
   columns?: CompositionColumns;
 } & CrudBinding;
 
-type CrudSetting = {
+export type CrudSettings = {
   viewFormUseCellComponent?: boolean;
   searchCopyFormProps?: string[];
   onUseCrud?: (bindings: CrudBinding) => void;
+  /**
+   * crudOptions插件，插件能够生成一些crudOptions配置，并与用户的crudOptions进行合并
+   */
+  plugins?: CrudOptionsPlugins;
 };
-type CrudMode = {
+export type CrudMode = {
   /**
    * 模式名称: local,remote
    */
@@ -1370,7 +1523,7 @@ export interface TabsFilterProps {
  * crudBinding
  */
 export type CrudBinding = {
-  setting?: CrudSetting;
+  settings?: CrudSettings;
   /**
    * 模式
    */

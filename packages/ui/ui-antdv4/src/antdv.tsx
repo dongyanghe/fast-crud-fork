@@ -41,6 +41,7 @@ import {
   PopoverBuilderOptions,
   PopoverCI,
   ProgressCI,
+  RadioButtonCI,
   RadioCI,
   RadioGroupCI,
   RowCI,
@@ -100,7 +101,7 @@ export class Antdv implements UiInterface {
         return { afterClose: onClosed };
       } else if (is === "a-drawer") {
         return {
-          onAfterVisibleChange: (visible: boolean) => {
+          onAfterOpenChange: (visible: boolean) => {
             if (visible === false) {
               onClosed(visible);
             }
@@ -434,7 +435,23 @@ export class Antdv implements UiInterface {
     name: "a-radio",
     value: "value",
     builder(opts) {
-      return buildBinding(this, opts, {});
+      return buildBinding(this, opts, {
+        props: {
+          [this.value]: opts.value
+        }
+      });
+    }
+  });
+
+  radioButton: RadioButtonCI = creator<RadioButtonCI>({
+    name: "a-radio-button",
+    value: "value",
+    builder(opts) {
+      return buildBinding(this, opts, {
+        props: {
+          [this.value]: opts.value
+        }
+      });
     }
   });
 
@@ -501,9 +518,9 @@ export class Antdv implements UiInterface {
     fixedHeaderNeedComputeBodyHeight: true,
     headerDomSelector: ".ant-table-thead",
     vLoading: false,
-    buildSelectionBinding(req) {
+    buildSelectionCrudOptions(req) {
       const selectedRowKeys = req.selectedRowKeys;
-      const onChange = (changed: any[]) => {
+      const onChange = (changed: any[] = []) => {
         req.onSelectedKeysChanged(changed);
       };
       let type = "radio";
@@ -511,11 +528,13 @@ export class Antdv implements UiInterface {
         type = "checkbox";
       }
       return {
-        rowSelection: {
-          type,
-          selectedRowKeys,
-          onChange,
-          preserveSelectedRowKeys: req.crossPage
+        table: {
+          rowSelection: {
+            type,
+            selectedRowKeys,
+            onChange,
+            preserveSelectedRowKeys: req.crossPage
+          }
         }
       };
     },

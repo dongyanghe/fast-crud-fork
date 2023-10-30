@@ -79,7 +79,9 @@ export interface TreeSelectCI extends CI<TreeSelectBuilderOption> {
   children: string;
 }
 
-export type RadioBuilderOption = {} & BindBuilderOptions;
+export type RadioBuilderOption = {
+  value?: string;
+} & BindBuilderOptions;
 export interface RadioCI extends CI<RadioBuilderOption> {
   value: string;
 }
@@ -87,6 +89,13 @@ export interface RadioCI extends CI<RadioBuilderOption> {
 export type RadioGroupBuilderOption = {} & BindBuilderOptions;
 export interface RadioGroupCI extends CI<RadioGroupBuilderOption> {
   modelValue: string;
+}
+
+export type RadioButtonBuilderOption = {
+  value?: string;
+} & BindBuilderOptions;
+export interface RadioButtonCI extends CI<RadioButtonBuilderOption> {
+  value: string;
 }
 
 export type InputBuilderOptions = {
@@ -236,7 +245,7 @@ export interface TableCI extends CI<TableBuilderOption> {
 
   scrollTo(req: TableScrollReq): void;
 
-  buildSelectionBinding(req: TableSelectionReq): ComponentBinding;
+  buildSelectionCrudOptions(req: TableSelectionReq): ComponentBinding;
   setSelectedRows?: (req: TableSetSelectedRows) => void;
 }
 
@@ -534,7 +543,8 @@ export interface ColorPickerCI extends CI {
 }
 
 export type ButtonGroupBuilderOptions = {} & BindBuilderOptions;
-export type ButtonGroupCI = CI<ButtonGroupBuilderOptions>;
+export interface ButtonGroupCI extends CI<ButtonGroupBuilderOptions> {}
+
 export interface Icons {
   refresh: string;
   search: string;
@@ -583,6 +593,7 @@ export interface UiInterface {
   formItem: FormItemCI;
   tooltip: TooltipCI;
   radioGroup: RadioGroupCI;
+  radioButton: RadioButtonCI;
   radio: RadioCI;
   checkboxGroup: CheckboxGroupCI;
   checkbox: CheckboxCI;
