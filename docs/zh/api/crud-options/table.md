@@ -205,21 +205,81 @@
 const crudOptions = {
     table:{
         editable:{
-            rowKey: "id",
-            enabled: false,
-            mode: "free", //模式，free=自由编辑，row=行编辑
-            exclusive: true, //是否排他式激活，激活一个，关闭其他
-            activeTrigger: "onClick", //激活触发方式,onClick,onDbClick,false
-            activeDefault: false,
-            isEditable(opts: { index: number; key: string; row: any }) {
-                //单元格是否可编辑
-                return true;
+            //是否启用编辑
+            enabled:true,
+            //模式，free 自由编辑，row：行编辑,cell：单元格编辑
+            mode:"free",  //"free" | "row" | "cell";
+            /**
+             * 是否排他式激活，激活一个，关闭其他
+             */
+            exclusive: true,
+            /**
+             * 排他式激活关闭其他编辑时的效果，是取消还是保存
+             */
+            exclusiveEffect: "save", // "cancel" | "save";
+
+            //单元格进入编辑模式的激活触发方式,onClick,onDbClick,false, 仅free模式生效
+            activeTrigger:"onClick", // "onClick" | "onDbClick" | false;
+            //是否默认激活
+            activeDefault:false, 
+            //通过一个方法判断哪些 cell可以激活编辑
+            isEditable: (opts)=>{
+                //(opts: { editableId: any; key: string; row: any }) => boolean;
+                if(opts.key === 'username'){
+                    //username不可编辑
+                    return false
+                }
+                return true
+            },  
+            updateCell: async (opts)=>{
+                // (opts: { editableId: any; row: any; key: string; value: any }) => Promise<any>;
+                //cell模式下，点击确认√，将编辑数据提交给后台的请求
+                const res = await request({
+                    url:"/xxx/cellUpdate",
+                    method:"post",
+                    data:{
+                        id:row.id,
+                        key,
+                        value
+                    }
+                })
+                // 如果id(table.rowKey)为负数，则是添加，后台需要返回新的id值，用于更新到表格内
+                // res 应该至少包含id(rowKey) 例如： {id:99,...}
+                return res
             },
-            onSetup(){
-                //可编辑初始化完成事件
+            /**
+             * 本地自定义插入方法
+             * 如果你不喜欢新增的记录在第一条的话，你可以自己实现插入方法
+             */
+            addRow: (data: any[], row: any)=>{
+                // (data: any[], row: any) => void
+                //在最后一行插入数据
+                data.push(roow)
+            }
+        }
+    },
+    
+    columns:{
+        key:{
+            column:{
+                //此处可以给某列单独进行一些配置，比table.editable优先级高
+                editable:{
+                    //该列是否禁用编辑, boolean | TableColumnEditableDisabledFunc;
+                    //比table.editable.isEditable优先级更高
+                    disabled: false,
+                    // 单元格提交的请求，示例同上
+                    updateCell: undefine //EditableUpdateCellRequest;
+                }
             }
         }
     }
 }
 
+
+
 ```
+
+### crudExpose.editable 
+crudExpose.editable暴露了很多editable相关的方法
+
+<<<@/../../packages/fast-crud/src/d/expose-editable.ts

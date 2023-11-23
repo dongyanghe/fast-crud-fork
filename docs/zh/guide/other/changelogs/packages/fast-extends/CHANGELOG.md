@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.19.2](https://github.com/fast-crud/fast-crud/compare/v1.19.1...v1.19.2) (2023-11-22)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+## [1.19.1](https://github.com/fast-crud/fast-crud/compare/v1.19.0...v1.19.1) (2023-11-20)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+# [1.19.0](https://github.com/fast-crud/fast-crud/compare/v1.18.5...v1.19.0) (2023-11-20)
+
+**Note:** Version bump only for package @fast-crud/fast-extends
+
+## [1.18.5](https://github.com/fast-crud/fast-crud/compare/v1.18.4...v1.18.5) (2023-11-08)
+
+### Bug Fixes
+
+* 修复file-uploader预览图片过大的问题 ([d92212f](https://github.com/fast-crud/fast-crud/commit/d92212fa35902d41a851d4399bdf09bbf4514b9e))
+
+## [1.18.4](https://github.com/fast-crud/fast-crud/compare/v1.18.3...v1.18.4) (2023-11-07)
+
+### Performance Improvements
+
+* 新增国际手机号输入框 ([ebabee2](https://github.com/fast-crud/fast-crud/commit/ebabee2f61caed3678f0681330ed3cb044803a2f))
+
 ## [1.18.3](https://github.com/fast-crud/fast-crud/compare/v1.18.2...v1.18.3) (2023-10-26)
 
 **Note:** Version bump only for package @fast-crud/fast-extends

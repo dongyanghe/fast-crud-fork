@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.19.2](https://github.com/fast-crud/fast-crud/compare/v1.19.1...v1.19.2) (2023-11-22)
+
+### Bug Fixes
+
+* **editable:** 行编辑只能删除第一条数据的bug ([daf041f](https://github.com/fast-crud/fast-crud/commit/daf041f21cf531b4e32655248e522c96dd06f460))
+* **editable:** 增加获取干净table数据的方法 ([1e1e487](https://github.com/fast-crud/fast-crud/commit/1e1e487d9e50f73d2fdd426d156bfd0138541404))
+
+### Performance Improvements
+
+* **editable:** 增加sub-crud示例 ([d2b67da](https://github.com/fast-crud/fast-crud/commit/d2b67dace06290ae9181b7d27903b9227ca8ce8b))
+
+## [1.19.1](https://github.com/fast-crud/fast-crud/compare/v1.19.0...v1.19.1) (2023-11-20)
+
+### Bug Fixes
+
+* 修复一些错误的类型定义 ([e098f51](https://github.com/fast-crud/fast-crud/commit/e098f511160148a824a1950bf4e85325c2ac50f0))
+
+# [1.19.0](https://github.com/fast-crud/fast-crud/compare/v1.18.5...v1.19.0) (2023-11-20)
+
+### Bug Fixes
+
+* **columnsFilter:** 修复列设置简单模式disabled和show无效的bug ([80fd97a](https://github.com/fast-crud/fast-crud/commit/80fd97abaca475a16de4354572c8f418f2505aa1))
+* **editable:** 支持多级数据 ([89db59e](https://github.com/fast-crud/fast-crud/commit/89db59ea2b3dbe8227399086513e27aa7c2ab7aa))
+* **form:** 修复form.wrapper.fullscreen无效的bug ([08e0493](https://github.com/fast-crud/fast-crud/commit/08e0493af8fb7ed93eca594c99d2cc2395b78689))
+
+### Features
+
+* **editable:** 行编辑支持表单校验 ([5cf8c91](https://github.com/fast-crud/fast-crud/commit/5cf8c91455d48d0080b8bb0ae7f3336d7bd6e941))
+* **editable:** 子表格editable ([01fb2b2](https://github.com/fast-crud/fast-crud/commit/01fb2b245560aa5c6ef51630e20ead0e212ced26))
+* **editable:** editable优化重构，分三种模式：free、row、cell，本次为破坏性更新，请谨慎升级 ([a592780](https://github.com/fast-crud/fast-crud/commit/a592780697dc723117bce8759b2c02223ed930c8))
+
+### Performance Improvements
+
+* **editable:** 增加示例 ([b0e2d84](https://github.com/fast-crud/fast-crud/commit/b0e2d840c1333a23b3270f84cb725c790510db50))
+
+## [1.18.5](https://github.com/fast-crud/fast-crud/compare/v1.18.4...v1.18.5) (2023-11-08)
+
+### Bug Fixes
+
+* 修复form.value会覆盖初始值的bug ([050f889](https://github.com/fast-crud/fast-crud/commit/050f889dfbdfb38debcd7c8e4a455acf07198530))
+
+## [1.18.4](https://github.com/fast-crud/fast-crud/compare/v1.18.3...v1.18.4) (2023-11-07)
+
+### Bug Fixes
+
+* 关闭antdv的默认分页 ([dc36caa](https://github.com/fast-crud/fast-crud/commit/dc36caaff1eb16d1769d2ed55cf465a01297475a))
+* 修复afterSubmit返回false仍然关闭对话框的bug ([80337ff](https://github.com/fast-crud/fast-crud/commit/80337ffc46eda74d526562d9f27c43a2b6eb0534))
+
+### Performance Improvements
+
+* component.on.event配置 ，兼容事件名称不用on开头的写法 ([28ccfa5](https://github.com/fast-crud/fast-crud/commit/28ccfa57b7bb9481fbdaae60d891b2ba74b6a489))
+
 ## [1.18.3](https://github.com/fast-crud/fast-crud/compare/v1.18.2...v1.18.3) (2023-10-26)
 
 ### Bug Fixes

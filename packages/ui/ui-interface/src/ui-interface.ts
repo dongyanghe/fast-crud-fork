@@ -60,6 +60,7 @@ export type SelectBuilderOption = {
 export interface SelectCI extends CI<SelectBuilderOption> {
   modelValue: string;
   clearable: string;
+  filterable: string;
   buildMultiBinding: (multiple: boolean) => ComponentBinding;
 }
 
@@ -575,6 +576,7 @@ export interface Icons {
   caretUp: string;
   caretDown: string;
   eye: string;
+  info: string;
 }
 export interface UiInterface {
   modelValue: string;

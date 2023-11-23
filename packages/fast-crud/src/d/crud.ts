@@ -478,6 +478,61 @@ export type RemoveProps = {
   [key: string]: any;
 };
 
+export type EditableProps = {
+  /**
+   * 是否启用编辑
+   */
+  enabled?: boolean;
+  rowKey?: string;
+  /**
+   * 是否readonly
+   */
+  readonly?: boolean;
+  addForm?: FormProps;
+  editForm?: FormProps;
+  //模式，free，row
+  mode?: "free" | "row" | "cell";
+  /**
+   * 是否排他式激活，激活一个，关闭其他
+   */
+  exclusive?: boolean;
+  /**
+   * 排他式激活关闭其他编辑时的效果，是取消还是保存
+   */
+  exclusiveEffect?: "cancel" | "save";
+
+  //激活触发方式,onClick,onDbClick,false, free模式生效
+  activeTrigger?: "onClick" | "onDbClick" | false;
+  activeDefault?: boolean;
+  //设置哪个cell可以激活编辑
+  isEditable?: (opts: { editableId: any; key: string; row: any }) => boolean;
+  /**
+   * 更新单元格方法
+   * @param opts
+   */
+  updateCell?: (opts: { editableId: any; row: any; key: string; value: any }) => Promise<any>;
+
+  /**
+   * 本地自定义插入方法
+   * 如果你不喜欢新增的记录在第一条的话，你可以自己实现插入方法
+   */
+  addRow?: (data: any[], row: any) => boolean;
+};
+
+export type TableColumnEditableDisabledFunc = (opts: { column: ColumnProps; editableId: any; row: any }) => boolean;
+export type EditableUpdateCellRequest = (opts: { editableId: any; row: any; key: string; value: any }) => Promise<any>;
+export type EditableUpdateColumnRequest = (opts: {
+  editableId: any;
+  row: any;
+  key: string;
+  data: any[];
+}) => Promise<any>;
+export type TableColumnEditableProps = {
+  disabled?: boolean | TableColumnEditableDisabledFunc;
+  updateCell?: EditableUpdateCellRequest;
+  updateColumn?: EditableUpdateColumnRequest;
+};
+
 export type ConditionalRenderProps = {
   match: (scope: ScopeContext) => boolean;
   render: (scope: ScopeContext) => UiSlotRet;
@@ -551,6 +606,11 @@ export type TableProps = {
   maxHeightAdjust?: number;
 
   /**
+   * 可编辑配置
+   */
+  editable?: EditableProps;
+
+  /**
    * [x]-table组件的配置
    */
   [key: string]: any;
@@ -595,6 +655,10 @@ export type FormWrapperProps = {
   buttons?: {
     [key: string]: ButtonProps<FormWrapperContext>;
   };
+  /**
+   * 打开对话框时是否全屏
+   */
+  fullscreen?: boolean;
   /**
    * 对应对话框组件的配置
    */
@@ -645,6 +709,34 @@ export type FormGroupProps = {
   };
   [key: string]: any;
 };
+/**
+ * 表单字段帮助说明配置
+ */
+export type FormItemHelperProps = {
+  /**
+   * 自定义渲染帮助说明
+   * @param scope
+   */
+  render?: (scope: any) => any;
+  /**
+   * 帮助文本
+   */
+  text?: string;
+  /**
+   * 帮助说明所在的位置，[ undefined | label]
+   */
+  position?: string;
+  /**
+   * [a|el|n]-tooltip配置
+   */
+  tooltip?: object;
+
+  /**
+   * 自定义配置
+   */
+  [key: string]: any;
+};
+
 /**
  * 表单配置
  */
@@ -727,34 +819,6 @@ export type FormProps = {
   };
   /**
    * 其他表单配置 [x]-form的配置
-   */
-  [key: string]: any;
-};
-
-/**
- * 表单字段帮助说明配置
- */
-export type FormItemHelperProps = {
-  /**
-   * 自定义渲染帮助说明
-   * @param scope
-   */
-  render?: (scope: any) => any;
-  /**
-   * 帮助文本
-   */
-  text?: string;
-  /**
-   * 帮助说明所在的位置，[ undefined | label]
-   */
-  position?: string;
-  /**
-   * [a|el|n]-tooltip配置
-   */
-  tooltip?: object;
-
-  /**
-   * 自定义配置
    */
   [key: string]: any;
 };
@@ -1186,6 +1250,7 @@ export type SearchItemProps = {
 export type TableColumnsProps = {
   [key: string]: ColumnProps;
 };
+
 /**
  * 表格列配置(单元格)
  */
@@ -1236,6 +1301,11 @@ export type ColumnProps = {
    * 是否支持导出
    */
   exportable?: boolean;
+
+  /**
+   * 单元格可编辑配置
+   */
+  editable?: TableColumnEditableProps;
   /**
    * 其他x-table-column配置
    */

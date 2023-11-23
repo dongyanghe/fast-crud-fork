@@ -25,7 +25,9 @@
 <script lang="ts">
 import { computed, defineComponent, Ref, ref, watch } from "vue";
 import { useUi } from "@fast-crud/fast-crud";
-// 文件格式化展示组件
+/**
+ * 文件格式化展示组件
+ */
 export default defineComponent({
   name: "FsFilesFormat",
   props: {
@@ -34,25 +36,21 @@ export default defineComponent({
      * 支持格式： `url , {url} , [url1,url2] ,  [{url:url1},{url:url2}]`
      */
     modelValue: {},
-    // tag颜色，【primary, success, warning, danger ,info】
+    // tag颜色，`【primary, success, warning, danger ,info】`
     color: {
       default: ""
     },
-    // 展示类型【text, tag】
+    // 展示类型`【text, tag】`
     type: {
-      default: "tag" // 可选【text,tag】
+      default: "tag" // `可选【text,tag】`
     },
     // 链接配置
     a: {},
     // tag配置
     tag: {},
     // 构建下载url方法，支持异步
-    buildUrl: {
-      type: Function,
-      default: function (value: any) {
-        return value;
-      }
-    },
+    buildUrl: {},
+    // 批量构建下载url方法，支持异步
     buildUrls: {},
     // 根据value构建文件名
     getFileName: {}

@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.19.2](https://github.com/jekip/naive-ui-admin/compare/v1.19.1...v1.19.2) (2023-11-22)
+
+**Note:** Version bump only for package naive-ui-admin
+
+## [1.19.1](https://github.com/jekip/naive-ui-admin/compare/v1.19.0...v1.19.1) (2023-11-20)
+
+**Note:** Version bump only for package naive-ui-admin
+
+# [1.19.0](https://github.com/jekip/naive-ui-admin/compare/v1.18.5...v1.19.0) (2023-11-20)
+
+### Bug Fixes
+
+* **form:** 修复form.wrapper.fullscreen无效的bug ([08e0493](https://github.com/jekip/naive-ui-admin/commit/08e0493af8fb7ed93eca594c99d2cc2395b78689))
+
+## [1.18.5](https://github.com/jekip/naive-ui-admin/compare/v1.18.4...v1.18.5) (2023-11-08)
+
+### Bug Fixes
+
+* 修复form.value会覆盖初始值的bug ([050f889](https://github.com/jekip/naive-ui-admin/commit/050f889dfbdfb38debcd7c8e4a455acf07198530))
+
+## [1.18.4](https://github.com/jekip/naive-ui-admin/compare/v1.18.3...v1.18.4) (2023-11-07)
+
+### Bug Fixes
+
+* 修复afterSubmit返回false仍然关闭对话框的bug ([80337ff](https://github.com/jekip/naive-ui-admin/commit/80337ffc46eda74d526562d9f27c43a2b6eb0534))
+
+### Performance Improvements
+
+* antdv 支持按钮组 ([cfdefdf](https://github.com/jekip/naive-ui-admin/commit/cfdefdf89bfe7e037d1a8d3c6416cf38678074c9))
+
 ## [1.18.3](https://github.com/jekip/naive-ui-admin/compare/v1.18.2...v1.18.3) (2023-10-26)
 
 **Note:** Version bump only for package naive-ui-admin

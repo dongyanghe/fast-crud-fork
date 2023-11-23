@@ -9,7 +9,7 @@ import {
   UserPageQuery
 } from "./crud";
 import { Ref } from "vue";
-import { EditableOnEnabledProps } from "../use";
+import { Editable } from "./expose-editable";
 
 export type SearchOptions = {
   silence?: boolean;
@@ -63,7 +63,7 @@ export type CrudExpose = {
    * key: 字段key
    * isAsync: 是否异步获取，传true时，此方法返回promise（当组件是异步组件<extends中的组件>时，第一次获取会为空，所以需要异步等待加载完成后才能获取）
    */
-  getFormComponentRef: (key: string, isAsync: boolean) => any;
+  getFormComponentRef: (key: string, isAsync?: boolean) => any;
   /**
    * 执行valueBuilder
    * @param rows 表格数据列表
@@ -211,9 +211,15 @@ export type CrudExpose = {
   removeTableRow: (index: number) => void;
 
   /**
-   * 获取表格数据某一行
+   * 获取表格数据某一行,不支持树形结构
    */
   getTableDataRow: (index: number) => any;
+
+  /**
+   * 根据rowKey删除某一行
+   * @param rowKey
+   */
+  removeTableRowByRowKey: (rowKey: any, data?: any[]) => boolean;
   /**
    * 选中某一行
    * @param context = {row}
@@ -224,47 +230,7 @@ export type CrudExpose = {
    */
   editable: Editable;
 };
-export type EditableAddRowOptions = {
-  row?: any;
-  active?: boolean;
-};
-export type EditableEditColsOptions = {
-  cols: any[];
-};
-export type Editable = {
-  enable(opts: any, onEnabled?: (opts: EditableOnEnabledProps) => void): Promise<void>;
-  /**
-   * 禁用编辑
-   */
-  disable(): void;
-  /**
-   * 激活所有编辑
-   */
-  active(): void;
-  /**
-   * 退出编辑
-   */
-  inactive(): void;
-  /**
-   * 添加行
-   */
-  addRow(opts?: EditableAddRowOptions): void;
-  /**
-   * 编辑cols
-   * @param opts
-   */
-  editCol(opts: EditableEditColsOptions): void;
-  /**
-   * 还原，取消编辑
-   */
-  resume(): void;
-  removeRow(index: number): void;
-  getEditableRow(index: number): any;
-  doSaveRow(opts: { index: number }): Promise<void>;
-  doCancelRow(opts: { index: number }): Promise<void>;
-  doRemoveRow(opts: { index: number }): Promise<void>;
-  getInstance(): any;
-};
+
 /**
  * index or row 必须传一个
  */

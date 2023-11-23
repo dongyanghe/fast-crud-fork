@@ -197,7 +197,8 @@ export class Element implements UiInterface {
     question: "question-filled",
     caretUp: "CaretTop",
     caretDown: "CaretBottom",
-    eye: "View"
+    eye: "View",
+    info: "warning"
   };
 
   dialog: DialogCI = creator<DialogCI>({
@@ -283,6 +284,7 @@ export class Element implements UiInterface {
     name: "el-select",
     modelValue: "modelValue",
     clearable: "clearable",
+    filterable: "filterable",
     buildMultiBinding(multiple) {
       return { multiple };
     }

@@ -25,15 +25,15 @@
 </template>
 <script lang="ts" setup>
 import { countries } from "./phoneCodeCountries.js";
-import { computed, ref, watch } from "vue";
+import { computed, Ref, ref, watch } from "vue";
 import { dict, useUi } from "@fast-crud/fast-crud";
 import _ from "lodash-es";
 const { ui } = useUi();
 
 type PhoneInputValue = {
-  callingCode: string;
-  countryCode: string;
-  phoneNumber: string;
+  callingCode?: string;
+  countryCode?: string;
+  phoneNumber?: string;
 };
 
 type PhoneInputProps = {
@@ -81,17 +81,12 @@ type PhoneInputProps = {
 };
 const formValidator = ui.formItem.injectFormItemContext();
 const props = withDefaults(defineProps<PhoneInputProps>(), {
-  modelValue: {
-    callingCode: undefined, // 电话区号
-    countryCode: undefined, // 国家代码
-    phoneNumber: undefined // 电话号码
-  },
   defaultCountry: "CN"
 });
 
 const emits = defineEmits(["change", "input", "update:modelValue"]);
 // eslint-disable-next-line vue/no-setup-props-destructure
-const selectValue = ref<PhoneInputValue>(
+const selectValue: Ref = ref<PhoneInputValue>(
   props.modelValue || {
     callingCode: undefined, // 电话区号
     countryCode: undefined, // 国家代码
@@ -139,10 +134,9 @@ const countryOptions = computed(() => {
 
 const computedSelect = computed(() => {
   const def = {
-    style: {
-      maxWidth: "200px"
-    },
     placeholder: "请选择",
+    [ui.select.filterable]: true,
+    [ui.select.clearable]: true,
     [ui.select.modelValue]: selectValue.value.countryCode,
     ["onUpdate:" + ui.select.modelValue]: handleSelectInput
   };
@@ -152,13 +146,14 @@ const computedSelect = computed(() => {
 const computedInput = computed(() => {
   const def: any = {
     placeholder: "请输入",
+    [ui.select.clearable]: true,
     [ui.input.modelValue]: selectValue.value.phoneNumber,
     [`onUpdate:${ui.input.modelValue}`]: handleNumberInput
   };
   return _.merge(def, props.input);
 });
 
-function isChanged(value) {
+function isChanged(value: any) {
   if (value === selectValue.value) {
     return false;
   }
@@ -174,7 +169,7 @@ function isChanged(value) {
   // }
 }
 
-function setValue(value) {
+function setValue(value: any) {
   selectValue.value = { callingCode: undefined, countryCode: undefined, phoneNumber: undefined };
   const ret = getCountryByValue(value);
   if (ret != null) {
@@ -187,8 +182,8 @@ function setValue(value) {
     selectValue.value.phoneNumber = undefined;
   }
 }
-function getCountryByValue(value) {
-  let ret = null;
+function getCountryByValue(value: any): any {
+  let ret: any = null;
   if (value != null) {
     if (value.countryCode != null) {
       ret = countryOptions.value.find((item) => item.iso2 === value.countryCode);
@@ -208,9 +203,9 @@ function getCountryByValue(value) {
   return ret;
 }
 
-function handleSelectInput(countryCode) {
+function handleSelectInput(countryCode: any) {
   changeCountry(countryCode);
-  let emitValue = getEmitValue();
+  let emitValue: any = getEmitValue();
   emits("update:modelValue", emitValue);
   emits("input", emitValue);
   emits("change", emitValue);
@@ -218,10 +213,10 @@ function handleSelectInput(countryCode) {
   formValidator.onBlur();
 }
 
-function handleNumberInput(number) {
+function handleNumberInput(number: any) {
   selectValue.value.phoneNumber = number;
   if (selectValue.value.callingCode == null && selectValue.value.countryCode == null) {
-    selectValue.value.countryCode = defaultCountry;
+    selectValue.value.countryCode = props.defaultCountry;
     const country = getCountryByValue(selectValue.value);
     if (country) {
       selectValue.value.callingCode = country.callingCode;
@@ -235,7 +230,7 @@ function handleNumberInput(number) {
   formValidator.onBlur();
 }
 
-function getEmitValue() {
+function getEmitValue(): PhoneInputValue {
   return {
     countryCode: selectValue.value.countryCode,
     callingCode: selectValue.value.callingCode,
@@ -243,7 +238,7 @@ function getEmitValue() {
   };
 }
 
-function changeCountry(countryCode) {
+function changeCountry(countryCode: any) {
   if (!countryCode) {
     selectValue.value.callingCode = undefined;
   }
@@ -271,16 +266,59 @@ watch(
 .fs-phone-input {
   display: flex;
   align-items: center;
-  .ant-select-selector {
-    width: 100px;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+  .ant-select {
+    width: 120px;
+    max-width: 50%;
+    .ant-select-selector {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
   }
+
   .ant-input,
   .ant-input-affix-wrapper {
     border-bottom-left-radius: 0;
     border-top-left-radius: 0;
     border-left: 0;
+  }
+
+  .el-select {
+    width: 100px;
+    max-width: 50%;
+
+    .el-input {
+      border-right: 0;
+    }
+    .el-input__wrapper {
+      border-right: 0;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+  .el-input {
+    border-left: 0;
+    .el-input__wrapper {
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
+      border-left: 0;
+    }
+  }
+
+  .n-select {
+    width: 100px;
+    max-width: 50%;
+    .n-base-selection {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    .n-base-selection__border {
+      border-right: 0;
+    }
+  }
+
+  .n-input {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
   }
 }
 </style>

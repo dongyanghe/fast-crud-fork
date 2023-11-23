@@ -15,7 +15,14 @@ import { useEditable } from "./editable/use-editable";
 import logger from "../../utils/util.log";
 import utilLog from "../../utils/util.log";
 import "./fs-table.less";
-import { ColumnProps, ConditionalRenderProps, ScopeContext, TableColumnsProps, WriteableSlots } from "../../d";
+import {
+  ColumnProps,
+  ConditionalRenderProps,
+  EditableProps,
+  ScopeContext,
+  TableColumnsProps,
+  WriteableSlots
+} from "../../d";
 import { UiInterface } from "@fast-crud/ui-interface";
 
 type BuildTableColumnsOption = {
@@ -235,7 +242,10 @@ export default defineComponent({
      * 行编辑，批量编辑
      */
     editable: {
-      type: Object as PropType<any>
+      type: Object as PropType<EditableProps>,
+      default() {
+        return {};
+      }
     },
 
     loading: {
@@ -250,10 +260,14 @@ export default defineComponent({
     },
     request: {
       type: Object as PropType<any>
+    },
+    rowKey: {
+      type: [String, Function],
+      default: "id"
     }
   },
   emits: ["row-handle", "value-change", "pagination-change", "filter-change", "sort-change", "data-change"],
-  setup(props, ctx) {
+  setup(props: any, ctx) {
     const tableRef = ref();
     const componentRefs = ref([]);
     const getComponentRef = (index?: number, key?: string) => {
@@ -341,7 +355,7 @@ export default defineComponent({
     const renderCellComponent = (item: any, scope: any) => {
       // console.log("render cell component",item.key,scope.record)
       const cellSlotName = "cell_" + item.key;
-      scope.row = scope[tableColumnCI.row];
+      const row = (scope.row = scope[tableColumnCI.row]);
       // const getScopeFn = () => {
       //   return getContextFn(item, scope);
       // };
@@ -367,21 +381,26 @@ export default defineComponent({
       };
 
       const index = scope[ui.tableColumn.index];
+      const editableId = row[props.editable?.rowKey];
 
       const cellSlots = props.cellSlots && props.cellSlots[cellSlotName];
       if (editableWrap.editable?.options?.value?.enabled === true) {
-        // if (props.editable && props.editable?.options?.value?.enabled === true) {
-        const editable = editableWrap.editable.getEditableCell(index, item.key);
+        // if (props.editableCell && props.editableCell?.options?.value?.enabled === true) {
+        const editableCell = editableWrap.editable.getEditableCell(editableId, item.key);
         return (
           <fs-editable-cell
             ref={setRef}
             key={item.key}
             columnKey={item.key}
             index={index}
+            editableId={editableId}
             item={item}
-            editable={editable}
+            editableCell={editableCell}
+            editableOpts={editableWrap.editable?.options?.value}
             scope={newScope}
             slots={cellSlots}
+            disabled={editableWrap.editable?.options?.value?.disabled}
+            readonly={editableWrap.editable?.options?.value?.readonly}
             {...vModel}
           />
         );
@@ -444,6 +463,7 @@ export default defineComponent({
           <tableComp
             ref={tableRef}
             loading={props.loading}
+            rowKey={props.rowKey}
             {...computedBinding.value}
             {...dataSource.value}
             v-slots={computedTableSlots.value}
@@ -479,6 +499,7 @@ export default defineComponent({
           <tableComp
             ref={tableRef}
             loading={props.loading}
+            rowKey={props.rowKey}
             {...computedBinding.value}
             columns={computedColumns.value}
             {...dataSource.value}

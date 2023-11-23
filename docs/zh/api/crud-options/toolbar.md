@@ -66,6 +66,7 @@ const crudOptions = {
             filename: 'table', // 导出文件名
             fileType: 'csv' ,// 导出文件类型，可选值：csv | excel=数据比较复杂时使用（包含逗号，换行等）
             dataFrom: 'local', //导出数据来源，可选值：local=本地页面数据 | search=导出前请求接口获取数据
+            autoUseDictLabel: true, //是否自动使用字典标签
             searchParams: { //当dataFrom=search时，导出前请求接口获取数据的参数
                 //查询条件
                 page: {
@@ -78,11 +79,13 @@ const crudOptions = {
             },
             merge: [], // excel 合并单元格配置,仅excel生效
             dataFormatter: (opts:DataFormatterContext)=>{
-                //自定义修改导出数据展示值
-                if(opts.col.key === 'name'){
-                    //例如： 给名字值后面加星号
-                    return opts.col.name +"※"
+                // 此方法里面要做的是修改row里面的数据
+                // { row, originalRow, col } :DataFormatterContext
+                //例如 格式化日期
+                if (col.key === "date" && originalRow.date) {
+                    row.date = dayjs(originalRow.date).format("YYYY-MM-DD HH:mm:ss");
                 }
+                
                 //参数说明
                 // DataFormatterContext = {row: any,originalRow: any, key: string, col: ColumnProps, exportCol:ExportColumn}
                 // row = 当前行数据

@@ -140,6 +140,10 @@ export default defineComponent({
         }
       };
 
+      if (wrapper.fullscreen != null) {
+        fullscreen.value = wrapper.fullscreen;
+      }
+
       /**
        * 是否内部打开对话框
        */
@@ -202,6 +206,7 @@ export default defineComponent({
     function getFormData() {
       return formRef.value?.getFormData();
     }
+
     function setFormData(form: any, options?: SetFormDataOptions) {
       formRef.value?.setFormData(form, options);
     }
@@ -256,6 +261,7 @@ export default defineComponent({
     const fullscreenEnabled = computed(() => {
       return !formWrapperIs.value?.endsWith("drawer");
     });
+
     function toggleFullscreen() {
       fullscreen.value = !fullscreen.value;
     }

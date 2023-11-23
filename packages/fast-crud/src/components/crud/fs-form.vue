@@ -254,10 +254,8 @@ export default defineComponent({
         logger.warn("form.value配置不支持Compute/AsyncCompute类型的动态计算");
       }
     });
-
     function createInitialForm() {
-      const form = _.cloneDeep(props.initialForm);
-
+      const form = {};
       // 初始数据赋值
       _.each(props.columns, (item, key) => {
         const defValue = unref(item.value);
@@ -265,6 +263,7 @@ export default defineComponent({
           _.set(form, key, defValue);
         }
       });
+      merge(form, _.cloneDeep(props.initialForm));
       return form;
     }
 
@@ -455,7 +454,6 @@ export default defineComponent({
     async function reset() {
       // ui.form.resetWrap(formRef.value, { form, initialForm: createInitialForm() });
       const initialForm = createInitialForm();
-      debugger;
       const entries = _.entries(form);
       for (const entry of entries) {
         const initialValue = _.get(initialForm, entry[0]);
@@ -543,6 +541,8 @@ export default defineComponent({
         }
       }
       ctx.emit("success", submitScope);
+
+      return submitScope;
     }
 
     onMounted(() => {
@@ -638,8 +638,8 @@ export default defineComponent({
     .el-date-editor,
     .el-input-number,
     .el-input,
-    .el-select,
-    .n-select,
+    > .el-select,
+    > .n-select,
     .n-date-picker,
     .n-input-number {
       width: 100%;

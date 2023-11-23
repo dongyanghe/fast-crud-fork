@@ -240,11 +240,18 @@ function useFixedHeight(props: any, ctx: SetupContext, { tableRef, containerRef 
       return;
     }
     const tableWrapperDom = tableDom.parentNode;
+
     const observer = new ResizeObserver(function (entries) {
       utilLog.debug("table resized", entries);
       // 每次被观测的元素尺寸发生改变这里都会执行
       if (entries.length > 0 && entries[0].contentRect.height > 0) {
         computeBodyHeight();
+        setTimeout(() => {
+          computeBodyHeight();
+        }, 200);
+        setTimeout(() => {
+          computeBodyHeight();
+        }, 500);
       }
     });
     observer.observe(tableWrapperDom); // 观测DOM元素
@@ -348,6 +355,7 @@ export default defineComponent({
     /**
      * 表格数据
      */
+    // eslint-disable-next-line vue/require-default-prop
     data: {
       type: Array
     },

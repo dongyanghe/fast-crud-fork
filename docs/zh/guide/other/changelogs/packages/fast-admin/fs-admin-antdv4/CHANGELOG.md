@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.19.2](https://github.com/fast-crud/fast-crud/compare/v1.19.1...v1.19.2) (2023-11-22)
+
+### Bug Fixes
+
+* **editable:** 行编辑只能删除第一条数据的bug ([daf041f](https://github.com/fast-crud/fast-crud/commit/daf041f21cf531b4e32655248e522c96dd06f460))
+
+## [1.19.1](https://github.com/fast-crud/fast-crud/compare/v1.19.0...v1.19.1) (2023-11-20)
+
+### Bug Fixes
+
+* 修复一些错误的类型定义 ([e098f51](https://github.com/fast-crud/fast-crud/commit/e098f511160148a824a1950bf4e85325c2ac50f0))
+
+# [1.19.0](https://github.com/fast-crud/fast-crud/compare/v1.18.5...v1.19.0) (2023-11-20)
+
+### Bug Fixes
+
+* **editable:** 支持多级数据 ([89db59e](https://github.com/fast-crud/fast-crud/commit/89db59ea2b3dbe8227399086513e27aa7c2ab7aa))
+
+## [1.18.5](https://github.com/fast-crud/fast-crud/compare/v1.18.4...v1.18.5) (2023-11-08)
+
+### Bug Fixes
+
+* 修复form.value会覆盖初始值的bug ([050f889](https://github.com/fast-crud/fast-crud/commit/050f889dfbdfb38debcd7c8e4a455acf07198530))
+
+## [1.18.4](https://github.com/fast-crud/fast-crud/compare/v1.18.3...v1.18.4) (2023-11-07)
+
+### Bug Fixes
+
+* 修复afterSubmit返回false仍然关闭对话框的bug ([80337ff](https://github.com/fast-crud/fast-crud/commit/80337ffc46eda74d526562d9f27c43a2b6eb0534))
+
+### Performance Improvements
+
+* 新增国际手机号输入框 ([ebabee2](https://github.com/fast-crud/fast-crud/commit/ebabee2f61caed3678f0681330ed3cb044803a2f))
+* antdv 支持按钮组 ([cfdefdf](https://github.com/fast-crud/fast-crud/commit/cfdefdf89bfe7e037d1a8d3c6416cf38678074c9))
+
 ## [1.18.3](https://github.com/fast-crud/fast-crud/compare/v1.18.2...v1.18.3) (2023-10-26)
 
 **Note:** Version bump only for package @fast-crud/fs-admin-antdv4

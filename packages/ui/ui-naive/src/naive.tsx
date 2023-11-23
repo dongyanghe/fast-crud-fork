@@ -279,7 +279,8 @@ export class Naive implements UiInterface {
     question: "QuestionCircleOutlined",
     caretUp: "CaretUpOutlined",
     caretDown: "CaretDownOutlined",
-    eye: "EyeOutlined"
+    eye: "EyeOutlined",
+    info: "InfoCircleOutlined"
   };
 
   dialog: DialogCI = creator<DialogCI>({
@@ -528,6 +529,7 @@ export class Naive implements UiInterface {
     name: "n-select",
     modelValue: "value",
     clearable: "clearable",
+    filterable: "filterable",
     buildMultiBinding: (multiple) => {
       return { multiple };
     }
@@ -563,7 +565,7 @@ export class Naive implements UiInterface {
     headerDomSelector: ".n-data-table-thead",
     vLoading: false,
     scrollTo(req: TableScrollReq) {
-      req.tableRef.value.scrollTo({ top: req.top });
+      req.tableRef?.value?.scrollTo({ top: req.top });
     },
     buildSelectionCrudOptions(req) {
       const onSelectionChange = (changed: any = []) => {

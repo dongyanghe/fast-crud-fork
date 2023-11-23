@@ -241,7 +241,8 @@ export class Antdv implements UiInterface {
     question: "QuestionCircleOutlined",
     caretUp: "CaretUpOutlined",
     caretDown: "CaretDownOutlined",
-    eye: "EyeOutlined"
+    eye: "EyeOutlined",
+    info: "InfoCircleOutlined"
   };
 
   dialog: DialogCI = creator<DialogCI>({
@@ -299,7 +300,7 @@ export class Antdv implements UiInterface {
   });
 
   buttonGroup = creator<ButtonGroupCI>({
-    name: "a-space",
+    name: "a-button-group",
     builder(opts) {
       return buildBinding(this, opts, {});
     }
@@ -474,6 +475,7 @@ export class Antdv implements UiInterface {
     name: "a-select",
     modelValue: "value",
     clearable: "allowClear",
+    filterable: "showSearch",
     buildMultiBinding(multiple: boolean) {
       return {
         mode: multiple ? "multiple" : ""
@@ -541,7 +543,7 @@ export class Antdv implements UiInterface {
     },
     scrollTo(req: TableScrollReq) {
       try {
-        const body = req.fsTableRef.vnode.el.querySelector(".ant-table-body");
+        const body = req.fsTableRef?.vnode?.el?.querySelector(".ant-table-body");
         if (body) {
           body.scrollTop = req.top;
         }
