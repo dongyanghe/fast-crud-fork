@@ -187,7 +187,8 @@ export default defineComponent({
   ],
   setup(props: any, ctx: any) {
     const { ui } = useUi();
-
+    const { merge } = useMerge();
+    const doMerge = merge;
     const { doComputed, AsyncComputeValue, ComputeValue } = useCompute();
     // eslint-disable-next-line vue/no-setup-props-destructure
     _.each(props.columns, (item) => {
@@ -211,7 +212,7 @@ export default defineComponent({
         }
       });
 
-      return _.cloneDeep(_.merge({}, props.initialForm, form));
+      return _.cloneDeep(merge({}, props.initialForm, form));
     }
 
     const formData = reactive(createInitialForm());
@@ -226,7 +227,7 @@ export default defineComponent({
       null,
       (value: any) => {
         const formItem = _.cloneDeep(props.formItem || {});
-        value = _.merge(formItem, value);
+        value = merge(formItem, value);
         if (!props.validate) {
           //如果关闭validate则去掉rules
           _.forEach(value, (item) => {
@@ -284,15 +285,14 @@ export default defineComponent({
         for (const key in formData) {
           delete formData[key];
         }
-        _.merge(formData, value || {});
+        merge(formData, value || {});
       },
       {
         deep: true
       }
     );
 
-    const { merge } = useMerge();
-    const doMerge = merge;
+
 
     const get = (form: any, key: any) => {
       return _.get(form, key);
@@ -631,6 +631,12 @@ export default defineComponent({
       .el-select,
       .el-date-editor {
         width: 100%;
+      }
+
+      .ant-btn-loading-icon {
+        display: flex;
+        margin-left: 2px;
+        margin-right: 2px;
       }
 
       &.el-form--label-top {

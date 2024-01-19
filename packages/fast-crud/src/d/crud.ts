@@ -165,6 +165,11 @@ export type FormScopeContext = {
    * 提交成功后的response
    */
   res?: any;
+
+  /**
+   * 表单数据
+   */
+  form: any;
 } & ScopeContext;
 
 export type ComponentEventContext = {
@@ -517,6 +522,8 @@ export type EditableProps = {
    * 如果你不喜欢新增的记录在第一条的话，你可以自己实现插入方法
    */
   addRow?: (data: any[], row: any) => boolean;
+
+  [key: string]: any;
 };
 
 export type TableColumnEditableDisabledFunc = (opts: { column: ColumnProps; editableId: any; row: any }) => boolean;
@@ -531,6 +538,7 @@ export type TableColumnEditableProps = {
   disabled?: boolean | TableColumnEditableDisabledFunc;
   updateCell?: EditableUpdateCellRequest;
   updateColumn?: EditableUpdateColumnRequest;
+  showAction?: boolean;
 };
 
 export type ConditionalRenderProps = {
@@ -779,7 +787,10 @@ export type FormProps = {
    * 表单对话框/抽屉配置
    */
   wrapper?: FormWrapperProps;
-
+  /**
+   * 点击保存按钮，表单校验之前做一些操作,返回false或抛异常，阻止后续操作
+   */
+  beforeValidate?: (context: FormScopeContext) => Promise<boolean>;
   /**
    * 提交前做一些操作,返回false或抛异常，阻止后续操作
    */
@@ -826,7 +837,7 @@ export type FormProps = {
 export type FormItemTitleRender = (context: ScopeContext) => any;
 
 export type RuleRecord = {
-  trigger?: string;
+  trigger?: string | string[];
 } & RuleItem;
 /**
  * 表单字段配置

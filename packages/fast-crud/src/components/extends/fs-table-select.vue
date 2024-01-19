@@ -1,14 +1,17 @@
 <template>
   <div class="fs-table-select">
-    <fs-dict-select
-      ref="dictSelectRef"
-      :dict="dict"
-      :disabled="disabled"
-      :readonly="readonly"
-      v-bind="computedSelect"
-      :open="false"
-      @click="openTableSelect"
-    />
+    <template v-if="!slots?.default">
+      <fs-dict-select
+        ref="dictSelectRef"
+        :dict="dict"
+        :disabled="disabled"
+        :readonly="readonly"
+        v-bind="computedSelect"
+        :open="false"
+        @click="openTableSelect"
+      />
+    </template>
+    <slot v-bind="scopeRef"></slot>
     <component :is="ui.formItem.skipValidationWrapper">
       <component :is="ui.dialog.name" v-model:[ui.dialog.visible]="dialogOpen" v-bind="computedDialogBinding">
         <div :style="{ width: '100%', height: height || '60vh' }">
@@ -68,6 +71,10 @@ type FsTableSelectProps = {
   select?: any;
 
   /**
+   * 是否显示选择框
+   */
+  showSelect?: boolean;
+  /**
    * 对话框配置
    */
   dialog?: any;
@@ -114,8 +121,25 @@ const props = withDefaults(defineProps<FsTableSelectProps>(), {
   dialog: undefined,
   select: undefined,
   crudOptionsOverride: undefined,
-  valueType: "value"
+  valueType: "value",
+  showSelect: true
 });
+
+const slots = defineSlots<{
+  /**`
+   * 默认插槽
+   * ```js
+   * scope = {
+   *  //是否已打开
+   *  opened:boolean,
+   *  //打开方法
+   *  open:()=>void
+   * }
+   * ```
+   */
+  default: any;
+}>();
+
 const emits = defineEmits(["change", "update:modelValue"]);
 const { ui } = useUi();
 const dictSelectRef = ref();
@@ -148,6 +172,7 @@ const openTableSelect = async () => {
   }
   dialogOpen.value = true;
   initSelectedKeys(props.modelValue);
+  await nextTick();
   await crudExpose.doRefresh();
 };
 
@@ -187,7 +212,7 @@ const computedDialogBinding = computed(() => {
     title: "选择",
     width: "80%"
   });
-  return _.merge(base, props.dialog);
+  return merge(base, props.dialog);
 });
 
 watch(
@@ -297,6 +322,16 @@ function onOk() {
   emits("change", value);
   dialogOpen.value = false;
 }
+
+const getScopeContext = () => {
+  return {
+    opened: dialogOpen,
+    open: openTableSelect
+  };
+};
+
+const scopeRef = ref(getScopeContext());
+defineExpose(scopeRef.value);
 </script>
 
 <style lang="less">

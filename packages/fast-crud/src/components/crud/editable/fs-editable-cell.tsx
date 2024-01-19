@@ -57,6 +57,10 @@ export default defineComponent({
       }
     }
     async function onSubmit() {
+      if (props.editableOpts?.mode === "free") {
+        await props.editableCell.persist();
+        return;
+      }
       await props.editableCell.save();
     }
     function onCancel() {
@@ -64,7 +68,11 @@ export default defineComponent({
     }
 
     const showAction: ComputedRef<boolean> = computed(() => {
-      return props.editableOpts?.mode === "cell" && props.editableCell.showAction !== false;
+      console.log(props.editableOpts?.mode, props.editableOpts.showAction, props.editableCell.showAction);
+      return (
+        (props.editableOpts?.mode === "cell" || props.editableOpts?.mode === "free") &&
+        props.editableCell.showAction !== false
+      );
     });
     const isDirty: ComputedRef<boolean> = computed(() => {
       return props.editableCell.isChanged && props.editableCell.isChanged();
@@ -109,9 +117,10 @@ export default defineComponent({
         return <fs-cell ref={"targetRef"} item={props.item} scope={props.scope} {...ctx.attrs} />;
       }
       const editableCell: EditableCell = props.editableCell;
-      const trigger = props.editableOpts.mode === "cell" ? props.editableOpts?.activeTrigger : false;
+      const trigger = showAction.value ? props.editableOpts?.activeTrigger : false;
       return (
         <fs-editable
+          ref={"editableRef"}
           class={"fs-editable-cell"}
           editing={editableCell?.isEditing}
           showAction={showAction.value}
@@ -129,7 +138,8 @@ export default defineComponent({
   },
   methods: {
     getTargetRef() {
-      return this.$refs.targetRef;
+      //@ts-ignore
+      return this.$refs.targetInputRef?.getTargetRef() || this.$refs.targetRef;
     }
   }
 });

@@ -158,19 +158,27 @@ export default defineComponent({
      * 重置表单后的操作
      */
     doReset: {
-      type: Function
+      type: Function,
+      default: undefined
+    },
+    /**
+     * 点击保存按钮，表单校验前执行操作（async）
+     */
+    beforeValidate: {
+      type: Function,
+      default: undefined
+    },
+    /**
+     * 表单校验完完成后，提交前处理（async）
+     */
+    beforeSubmit: {
+      type: Function,
+      default: undefined
     },
     /**
      * 点击保存按钮时执行操作（async）
      */
     doSubmit: {
-      type: Function,
-      default: undefined
-    },
-    /**
-     * 表单提交前处理（async）
-     */
-    beforeSubmit: {
       type: Function,
       default: undefined
     },
@@ -237,9 +245,14 @@ export default defineComponent({
      */
     helper: {
       type: Object
+    },
+
+    watch: {
+      type: Function,
+      default: null
     }
   },
-  emits: ["reset", "submit", "success", "validationError", "value-change"],
+  emits: ["reset", "submit", "success", "validationError", "value-change", "init"],
   setup(props, ctx) {
     const { merge } = useMerge();
     const { ui } = useUi();
@@ -338,7 +351,7 @@ export default defineComponent({
       return { key: item.key, ...scope.value };
     }
 
-    doValueBuilder(form);
+    // doValueBuilder(form);
 
     // watch(
     //   () => props.initialForm,
@@ -430,7 +443,7 @@ export default defineComponent({
       //default columns排序
       _.forEach(computedColumns.value, (value, key) => {
         const item = _.cloneDeep(props.formItem || {});
-        value = _.merge(item, value);
+        value = merge(item, value);
         value.key = key;
         if (value.order == null) {
           value.order = Constants.orderDefault;
@@ -485,6 +498,14 @@ export default defineComponent({
       }
     }
     async function submit() {
+      const validateScope = { ...scope.value, form };
+      if (props.beforeValidate) {
+        const ret = await props.beforeValidate(validateScope);
+        if (ret === false) {
+          return false;
+        }
+      }
+
       try {
         errorsRef.value = {};
         await ui.form.validateWrap(formRef.value);
@@ -583,6 +604,25 @@ export default defineComponent({
       }
       return false;
     }
+
+    if (props.watch) {
+      watch(
+        () => {
+          return form;
+        },
+        (newVal, oldVal) => {
+          if (props.watch) {
+            props.watch(scope.value);
+          }
+        },
+        {
+          deep: true,
+          immediate: true
+        }
+      );
+    }
+
+    ctx.emit("init", scope.value);
 
     return {
       get: (form: any, key: string) => {

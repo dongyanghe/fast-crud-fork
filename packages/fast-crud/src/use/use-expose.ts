@@ -358,7 +358,7 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
 
       let searchFormData = pageQuery.form;
       if (searchFormData == null) {
-        searchFormData = _.cloneDeep(crudExpose.getSearchValidatedFormData());
+        searchFormData = _.cloneDeep(crudExpose.getSearchValidatedFormData()) || {};
         //配置searchValueResolve
         if (crudBinding.value?.search?.columns) {
           crudExpose.doValueResolve({ form: searchFormData }, toRaw(crudBinding.value.search.columns));
@@ -437,10 +437,18 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
 
       const page = crudExpose.getPage();
       const pageRes = await crudExpose.search({ page }, { silence: props?.silence });
+      if (pageRes == null) {
+        logger.error(
+          "pageRequest返回结构不正确，请配置正确的request.transformRes，期望：{currentPage>0, pageSize>0, total, records:[]},实际返回：",
+          pageRes
+        );
+        return;
+      }
       const { currentPage = page.currentPage || 1, pageSize = page.pageSize, total } = pageRes;
       const { records } = pageRes;
       if (
         records == null ||
+        !(records instanceof Array) ||
         total == null ||
         currentPage == null ||
         currentPage <= 0 ||
@@ -452,6 +460,9 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
         logger.error(
           "pageRequest返回结构不正确，请配置正确的request.transformRes，期望：{currentPage>0, pageSize>0, total, records:[]},实际返回：",
           pageRes
+        );
+        logger.info(
+          "如果你的不需要分页，也需要按照上面的格式返回，可以让pageSize=99999，然后配置crudOptions.pagination.show=false来隐藏分页组件"
         );
         return;
       }

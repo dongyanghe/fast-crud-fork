@@ -180,6 +180,26 @@ const crudOptions = {
 * 注意：仅在独立使用表单组件时有效，fs-crud中会被行数据代替，你可以在字段中配置columns.key.form.value=默认值
 * 类型：Object
 
+
+## watch
+* 说明: 表单数据监听,可以做实时计算
+* 类型：`(context:FormScopeContext)=>void`
+* 示例：
+```js
+const crudOptions = {
+    form:{
+        watch({form}){
+            //实时计算c=a+b
+            form.c=form.a+form.b
+        }
+    }
+}
+```
+
+## beforeValidate
+* 说明: 保存按钮后，表单校验之前触发，返回false或抛异常即可中止提交
+* 类型：`async (context)=>void`
+
 ## beforeSubmit
 * 说明: 表单提交前触发，，返回false或抛异常即可中止提交
 * 类型：`async (context)=>void`

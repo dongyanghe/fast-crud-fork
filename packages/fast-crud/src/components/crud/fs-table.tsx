@@ -24,6 +24,8 @@ import {
   WriteableSlots
 } from "../../d";
 import { UiInterface } from "@fast-crud/ui-interface";
+import { useMerge } from "../../use";
+import { useComponentRefProvider } from "./use/provider";
 
 type BuildTableColumnsOption = {
   props: any;
@@ -270,6 +272,7 @@ export default defineComponent({
   setup(props: any, ctx) {
     const tableRef = ref();
     const componentRefs = ref([]);
+    useComponentRefProvider(componentRefs);
     const getComponentRef = (index?: number, key?: string) => {
       if (!key || index == null || index > componentRefs.value.length) {
         return;
@@ -353,7 +356,6 @@ export default defineComponent({
     };
 
     const renderCellComponent = (item: any, scope: any) => {
-      // console.log("render cell component",item.key,scope.record)
       const cellSlotName = "cell_" + item.key;
       const row = (scope.row = scope[tableColumnCI.row]);
       // const getScopeFn = () => {
@@ -435,8 +437,9 @@ export default defineComponent({
       };
     });
 
+    const { merge } = useMerge();
     const computedBinding = computed(() => {
-      return _.merge({}, ctx.attrs, events);
+      return merge({}, ctx.attrs, events);
     });
     const sortedColumns = computed(() => {
       // 已经在useColumns中排序过了

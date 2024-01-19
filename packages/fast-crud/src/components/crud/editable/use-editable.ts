@@ -15,6 +15,7 @@ import {
   FormItemProps
 } from "../../../d";
 import { createValidator } from "./validator";
+import logger from "../../../utils/util.log";
 
 function eachTree(tree: any, callback: any) {
   _.forEach(tree, (item) => {
@@ -130,6 +131,9 @@ export function useEditable(props: any, ctx: any, tableRef: any): { editable: Ed
     const updateCell: any = computed(() => {
       return col.editable?.updateCell || options.value.updateCell;
     });
+    const showAction: any = computed(() => {
+      return col.editable?.showAction || options.value.showAction;
+    });
     const cell: EditableCell = reactive({
       mode: editableId < 0 ? "add" : "edit",
       oldValue: undefined,
@@ -139,7 +143,7 @@ export function useEditable(props: any, ctx: any, tableRef: any): { editable: Ed
       activeTrigger: options.value.activeTrigger,
       column: col,
       updateCell,
-      showAction: true,
+      showAction,
       isEditable: () => {
         let disabled = col?.editable?.disabled;
         if (disabled instanceof Function) {
@@ -172,11 +176,11 @@ export function useEditable(props: any, ctx: any, tableRef: any): { editable: Ed
             cancelAll();
           }
         }
-        if (opts.showAction != null) {
-          cell.showAction = opts.showAction;
-        } else {
-          cell.showAction = null;
-        }
+        // if (opts.showAction != null) {
+        //   cell.showAction = opts.showAction;
+        // } else {
+        //   cell.showAction = null;
+        // }
         cell.isEditing = true;
 
         cell.oldValue = getValue(key);
@@ -210,6 +214,9 @@ export function useEditable(props: any, ctx: any, tableRef: any): { editable: Ed
       save: async () => {
         const updateCell = unref(cell.updateCell);
         if (!updateCell) {
+          logger.warn(
+            "没有配置table.editable.updateCell方法,无法保存，相关文档：http://fast-crud.docmirror.cn/api/crud-options/table.html#editable"
+          );
           return;
         }
         cell.loading = true;
@@ -423,7 +430,6 @@ export function useEditable(props: any, ctx: any, tableRef: any): { editable: Ed
       return JSON.stringify(thinData);
     },
     (thinData, oldThinData) => {
-      console.log("data changed", thinData);
       if (options.value.enabled) {
         setupEditable(props.data);
       }
