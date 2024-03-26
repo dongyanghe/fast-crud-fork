@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.20.2](https://github.com/fast-crud/fast-crud/compare/v1.20.1...v1.20.2) (2024-03-21)
+
+### Bug Fixes
+
+* 修复单元格valueChange 的value 改变滞后的问题 ([768c233](https://github.com/fast-crud/fast-crud/commit/768c233c915dc4277f3fb49106bf99f0bd1fb31c))
+
+### Performance Improvements
+
+* 升级依赖版本 ([42ae562](https://github.com/fast-crud/fast-crud/commit/42ae56289cc9d80ee1b3c1f9b7b2dd4656e9ba84))
+* table-select element增加radio列 ([b56b5df](https://github.com/fast-crud/fast-crud/commit/b56b5df79c6ce634bdac0545e83629f6f5587d42))
+
+## [1.20.1](https://github.com/fast-crud/fast-crud/compare/v1.20.0...v1.20.1) (2024-02-27)
+
+**Note:** Version bump only for package @fast-crud/fs-admin-antdv4
+
+# [1.20.0](https://github.com/fast-crud/fast-crud/compare/v1.19.3...v1.20.0) (2024-01-28)
+
+### Bug Fixes
+
+* 修复查询valueChange 修改form无效的bug ([054f8b4](https://github.com/fast-crud/fast-crud/commit/054f8b4b808a52f6d8daf2d19ee3adf43f693c0a))
+
+### Performance Improvements
+
+* 优化element 日期示例，格式化问题，输入数据格式告警问题，range样式问题 ([66fd07b](https://github.com/fast-crud/fast-crud/commit/66fd07b96143b77ed73b5e3b88182070ebdb4c80))
+* 优化form.wrapper.buttons的默认配置 ([61f2ae5](https://github.com/fast-crud/fast-crud/commit/61f2ae5600814a59e2eaad8933892c1ec9f57c69))
+* 优化free模式，支持默认不激活 ([aeaf0a6](https://github.com/fast-crud/fast-crud/commit/aeaf0a683ecc24dcb86036daea363f3019347299))
+* dict-tree组件无需手动配置labelName keyName ([c8b0ee1](https://github.com/fast-crud/fast-crud/commit/c8b0ee1ee5fa22e73b3a8ef77e1ad3335351dc70))
+
 ## [1.19.3](https://github.com/fast-crud/fast-crud/compare/v1.19.2...v1.19.3) (2023-12-15)
 
 ### Bug Fixes

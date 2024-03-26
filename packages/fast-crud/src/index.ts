@@ -8,7 +8,7 @@ import { uiContext } from "./ui";
 import { GlobalConfig, LoggerConfig, useDictDefine, useMerge } from "./use";
 import { App } from "vue";
 import { FsSetupOptions } from "./d";
-import _ from "lodash-es";
+
 export * from "./utils/index";
 export * from "./use";
 export * from "./components";
@@ -33,9 +33,11 @@ export const FastCrud = {
     if (options.i18n) {
       i18n.setVueI18n(options.i18n);
     }
+
+    const customComponents = options.customComponents || {};
     for (const key in components) {
       // @ts-ignore
-      const com = components[key];
+      const com = customComponents[key] || components[key];
       app.component(key, com);
     }
 

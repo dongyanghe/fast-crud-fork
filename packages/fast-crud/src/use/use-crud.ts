@@ -15,10 +15,13 @@ import {
   CrudOptionsPlugins,
   CrudSettings,
   DynamicallyCrudOptions,
+  EditableRow,
+  RowRecord,
   ScopeContext,
   TableColumnsProps,
   UseCrudProps,
   UseCrudRet,
+  UseFsContext,
   UseFsProps,
   UseFsRet
 } from "../d";
@@ -33,12 +36,19 @@ import { getCrudOptionsPlugin } from "../use/use-plugins";
 const { merge } = useMerge();
 
 // 导出useCrud
-export function useCrud(ctx: UseCrudProps): UseCrudRet {
+export function useCrud<T = any, R = any>(ctx: UseCrudProps<T, R>): UseCrudRet<R> {
   if (ctx.context == null) {
+    //@ts-ignore
     ctx.context = {};
   }
   const ui = uiContext.get();
   const { t } = useI18n();
+  const ct = (name: string) => {
+    return computed(() => {
+      return t(name);
+    });
+  };
+
   let options: CrudOptions = ctx.crudOptions as CrudOptions;
   const crudExpose = ctx.expose || ctx.crudExpose;
   if (!crudExpose) {
@@ -115,6 +125,17 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
               await expose.doRemove(context);
             }
           },
+          copy: {
+            show: false,
+            click: async (context: ScopeContext) => {
+              // @ts-ignore
+              context.row = context[ui.tableColumn.row];
+              await expose.openCopy({
+                row: context.row,
+                index: context.index
+              });
+            }
+          },
           edit: {
             click: async (context: ScopeContext) => {
               // @ts-ignore
@@ -162,7 +183,7 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
             baseTableRef.clearSort();
           }
         },
-        onSearch() {
+        on_search() {
           crudExpose.doRefresh({ goFirstPage: true });
         },
         ["onUpdate:form"]: (value: any) => {
@@ -202,7 +223,7 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
           refresh: {
             type: "primary",
             icon: ui.icons.refresh,
-            title: t("fs.toolbar.refresh.title"), // '刷新',
+            title: ct("fs.toolbar.refresh.title"), // '刷新',
             order: 1,
             circle: true,
             click: async () => {
@@ -214,7 +235,7 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
               return crudBinding.value.search.show !== false ? "primary" : "default";
             }),
             icon: ui.icons.search,
-            title: t("fs.toolbar.search.title"), // '查询显示',
+            title: ct("fs.toolbar.search.title"), // '查询显示',
             order: 2,
             circle: true,
             click: () => {
@@ -226,7 +247,7 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
               return crudBinding.value.toolbar.compact ? "primary" : "default";
             }),
             icon: ui.icons.compact,
-            title: t("fs.toolbar.compact.title"), // '紧凑模式',
+            title: ct("fs.toolbar.compact.title"), // '紧凑模式',
             order: 3,
             circle: true,
             click: () => {
@@ -239,7 +260,7 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
             icon: ui.icons.export,
             order: 4,
             loading: exporting,
-            title: t("fs.toolbar.export.title"), // '导出',
+            title: ct("fs.toolbar.export.title"), // '导出',
             circle: true,
             click: async () => {
               exporting.value = true;
@@ -253,7 +274,7 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
           columns: {
             type: "primary",
             icon: ui.icons.columnsFilter,
-            title: t("fs.toolbar.columns.title"), // '列设置',
+            title: ct("fs.toolbar.columns.title"), // '列设置',
             circle: true,
             order: 5
           }
@@ -326,7 +347,7 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
         buttons: {
           addRow: {
             show: false, //默认不启用
-            text: t("fs.actionbar.add"),
+            text: ct("fs.actionbar.add"),
             type: "primary",
             click: () => {
               expose.editable.addRow();
@@ -356,9 +377,20 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
                 const editableRow = expose.editable.getEditableRow(editableId);
                 return !!editableRow?.loading;
               }),
-              click: (context: ScopeContext) => {
+              click: async (context: ScopeContext) => {
                 const { index, row } = context;
                 const editableId = row[crudBinding.value.table.editable.rowKey];
+                if (crudBinding.value.table.editable.exclusive) {
+                  //排他式激活
+                  const activeRows: EditableRow[] = expose.editable.getActiveRows();
+                  _.forEach(activeRows, (item: EditableRow) => {
+                    if (crudBinding.value.table.editable.exclusiveEffect === "save") {
+                      expose.editable.doSaveRow({ row: item.rowData });
+                    } else {
+                      expose.editable.doCancelRow({ row: item.rowData });
+                    }
+                  });
+                }
                 expose.editable.getEditableRow(editableId)?.active();
               },
               show: compute((context: ComputeContext) => {
@@ -397,7 +429,8 @@ export function useCrud(ctx: UseCrudProps): UseCrudRet {
               ...ui.button.colors("danger"),
               click: async (context: ScopeContext) => {
                 const { index, row } = context;
-                await expose.editable?.doRemoveRow({ row });
+                const editableId = row[crudBinding.value.table.editable.rowKey];
+                await expose.editable?.doRemoveRow({ row, editableId });
               }
             }
           }
@@ -540,7 +573,7 @@ function useFsImpl(props: UseFsProps): UseFsRet | Promise<UseCrudRet> {
   }
 }
 
-export function useFs(props: UseFsProps): UseFsRet {
+export function useFs<R = any, C = any>(props: UseFsProps<R, C>): UseFsRet<R, C> {
   return useFsImpl(props) as UseFsRet;
 }
 

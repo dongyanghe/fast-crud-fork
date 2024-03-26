@@ -50,10 +50,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, getCurrentInstance, ref, Ref } from "vue";
+import { computed, defineComponent, ref, Ref } from "vue";
 import VueCropper from "./utils/vue-cropperjs.js";
 import "cropperjs/dist/cropper.css";
 import { useI18n, useUi } from "@fast-crud/fast-crud";
+
 /**
  * 图片裁剪对话框
  * 内部封装了[cropperjs](https://github.com/fengyuanchen/cropperjs)
@@ -100,6 +101,10 @@ export default defineComponent({
     output: {
       type: String,
       default: "blob" // blob
+    },
+    compressQuality: {
+      type: Number,
+      default: 0.8
     }
   },
   emits: ["cancel", "done", "ready"],
@@ -233,11 +238,17 @@ export default defineComponent({
       }
     }
 
-    function getCropImageDataUrl() {
+    function getCropImageDataUrl(fileType: string, quality?: any) {
       // get image data for post processing, e.g. upload or setting image src
-      return cropperRef.value.getCroppedCanvas().toDataURL();
+      if (quality == null) {
+        quality = props.compressQuality;
+      }
+      return cropperRef.value.getCroppedCanvas().toDataURL(fileType, quality);
     }
-    function getCropImageBlob(callback: any, type?: any, quality?: any) {
+    function getCropImageBlob(callback: any, type: string, quality?: any) {
+      if (quality == null) {
+        quality = props.compressQuality;
+      }
       return cropperRef.value.getCroppedCanvas().toBlob(callback, type, quality);
     }
     function emit(result: any) {
@@ -247,11 +258,11 @@ export default defineComponent({
       const ret: any = { file };
       if (props.output === "all") {
         getCropImageBlob((blob: any) => {
-          const dataUrl = getCropImageDataUrl();
+          const dataUrl = getCropImageDataUrl(file.type);
           ret.blob = blob;
           ret.dataUrl = dataUrl;
           emit(ret);
-        });
+        }, file.type);
         return;
       }
 
@@ -259,11 +270,11 @@ export default defineComponent({
         getCropImageBlob((blob: any) => {
           ret.blob = blob;
           emit(ret);
-        });
+        }, file.type);
         return;
       }
       if (props.output === "dataUrl") {
-        ret.dataUrl = getCropImageDataUrl();
+        ret.dataUrl = getCropImageDataUrl(file.type);
         emit(ret);
       }
     }

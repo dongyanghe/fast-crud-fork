@@ -20,7 +20,11 @@ import { useI18n, useUi } from "@fast-crud/fast-crud";
 import _ from "lodash-es";
 import { FileItem, FsUploaderDoUploadOptions } from "../d/type";
 import { useUploader } from "./utils";
-
+import type { PropType } from "vue";
+/**
+ * 限制上传图片的像素尺寸
+ */
+type PixelLimit = { width?: number; height?: number; tip?: string } | [number, number?, string?];
 /**
  * 文件上传组件
  * 支持对应ui库的[x]-file-uploader组件的配置
@@ -46,6 +50,14 @@ export default defineComponent({
      */
     sizeLimit: {
       type: [Number, Object]
+    },
+    /**
+     * 限制上传图片的像素尺寸
+     * 可以传数组会对象{ width?: number, height?: number, tip?: string } | [number, number?, string?]
+     */
+    pixelLimit: {
+      type: Object as PropType<PixelLimit>,
+      required: false
     },
     /**
      * 构建url的方法
@@ -128,7 +140,7 @@ export default defineComponent({
     const pickFileName = computed(() => {
       return (
         props.getFileName ||
-        ((url: string) => {
+        (async (url: string) => {
           if (typeof url !== "string") {
             console.warn("获取文件名失败，请配置getFileName");
             return url;
@@ -189,7 +201,7 @@ export default defineComponent({
       for (const item of arr) {
         if (!item.name) {
           const url = item.url || item.value;
-          item.name = pickFileName.value(url);
+          item.name = await pickFileName.value(url);
         }
       }
       return arr;
@@ -367,7 +379,53 @@ export default defineComponent({
         }
       }
     }
-
+    /**
+     * 图片上传前判断图片像素尺寸是否符合
+     * @param file
+     */
+    const checkPixelLimit = (file: File): Promise<boolean> => {
+      let imageMaxWidth = 0;
+      let imageMaxHeight = 0;
+      let tip = "";
+      if (!props.pixelLimit) {
+        return Promise.resolve(true);
+      } else if (Array.isArray(props.pixelLimit)) {
+        imageMaxWidth = props.pixelLimit[0];
+        imageMaxHeight = props.pixelLimit[1] || props.pixelLimit[0] || 0;
+        tip = props.pixelLimit[2] || "";
+      } else if (typeof props.pixelLimit == "object") {
+        imageMaxWidth = props.pixelLimit.width || 0;
+        imageMaxHeight = props.pixelLimit.height || 0;
+        tip = props.pixelLimit.tip || "";
+      }
+      let errMsg = tip || t("fs.extends.fileUploader.pixelLimitTip", [imageMaxWidth, imageMaxHeight]);
+      return new Promise((resolve, reject) => {
+        let reader = new FileReader();
+        reader.onload = (e) => {
+          let src = e.target?.result;
+          let image = new Image();
+          image.onload = function () {
+            if (imageMaxWidth && image.width > imageMaxWidth) {
+              ui.message.warn(errMsg);
+              reject(errMsg);
+            } else if (imageMaxHeight && image.height > imageMaxHeight) {
+              ui.message.warn(errMsg);
+              reject(errMsg);
+            } else {
+              resolve(true);
+            }
+          };
+          image.onerror = function (e) {
+            ui.message.warn(t("fs.extends.fileUploader.loadError"));
+            reject(t("fs.extends.fileUploader.loadError"));
+          };
+          if (src) {
+            image.src = src as string;
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    };
     const beforeUpload = async (file: any, list = fileList.value) => {
       if (props.beforeUpload) {
         const ret = await props.beforeUpload({ file, fileList: fileList.value });
@@ -378,6 +436,9 @@ export default defineComponent({
       try {
         checkLimit();
         checkSizeLimit(file);
+        if (isPicture()) {
+          await checkPixelLimit(file);
+        }
       } catch (e) {
         return false;
       }
@@ -633,10 +694,12 @@ export default defineComponent({
       display: none;
     }
   }
+
   .ant-upload-list-item-actions {
     display: flex;
     justify-content: center;
     align-items: center;
+
     > a {
       display: flex;
       align-items: center;
@@ -647,27 +710,33 @@ export default defineComponent({
   .el-upload {
     justify-content: left;
   }
+
   // element
   .el-upload-list--picture-card .el-upload-list__item {
     width: 100px;
     height: 100px;
     //line-height: 100px;
   }
+
   .el-upload--picture-card {
     width: 100px;
     height: 100px;
     justify-content: center;
   }
+
   &.fs-file-uploader-limit {
     .el-upload--picture-card {
       display: none;
     }
   }
+
   .el-upload--text {
     width: 100%;
     text-align: left;
+
     .el-upload-dragger {
       width: 100%;
+
       .el-button {
         width: 100%;
         height: 100%;
@@ -675,6 +744,7 @@ export default defineComponent({
         flex-direction: column;
         align-items: center;
         justify-content: center;
+
         .el-icon-upload {
           margin: 0;
           margin-bottom: 10px;

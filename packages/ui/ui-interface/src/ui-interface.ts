@@ -79,6 +79,7 @@ export interface TreeSelectCI extends CI<TreeSelectBuilderOption> {
   value: string;
   label: string;
   children: string;
+  buildOptionKeysNameBinding(param: { children: any; label: any; value: any }): any;
 }
 
 export type RadioBuilderOption = {
@@ -220,6 +221,7 @@ export type TableSelectionReq = {
   getRowKey?: () => any;
   getPageData?: () => any[];
   multiple: boolean;
+  useCompute: () => { compute: any; asyncCompute: any };
   selectedRowKeys: Ref<any[]>;
   onSelectedKeysChanged: (selectedRowKeys: any[]) => void;
 };

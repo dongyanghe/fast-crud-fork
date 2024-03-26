@@ -3,6 +3,64 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.20.2](https://github.com/fast-crud/fast-crud/compare/v1.20.1...v1.20.2) (2024-03-21)
+
+### Bug Fixes
+
+* 修复单元格valueChange 的value 改变滞后的问题 ([768c233](https://github.com/fast-crud/fast-crud/commit/768c233c915dc4277f3fb49106bf99f0bd1fb31c))
+* 修复搜索栏只有一个输入框时点回车 会刷新浏览器的bug ([677114d](https://github.com/fast-crud/fast-crud/commit/677114d6847be8559b33c9b36ca19b8d160ecc3d))
+* getFileName方法支持await ([c90f1b7](https://github.com/fast-crud/fast-crud/commit/c90f1b76eb0d1d55c7e4b8530d06c8c4c9af9970))
+
+### Performance Improvements
+
+* 升级依赖版本 ([42ae562](https://github.com/fast-crud/fast-crud/commit/42ae56289cc9d80ee1b3c1f9b7b2dd4656e9ba84))
+* rowHandle增加复制按钮，以当前行数据打开一个添加对话框，默认隐藏，配置rowHandle.buttons.copy.show=true开启此按钮 ([95da11f](https://github.com/fast-crud/fast-crud/commit/95da11f09f1c5bd8cc3b6a1548efefedca8843ba))
+* table-select element增加radio列 ([b56b5df](https://github.com/fast-crud/fast-crud/commit/b56b5df79c6ce634bdac0545e83629f6f5587d42))
+
+## [1.20.1](https://github.com/fast-crud/fast-crud/compare/v1.20.0...v1.20.1) (2024-02-27)
+
+### Bug Fixes
+
+* 修复1.20.0版本子表行編輯情況下，删除无效的bug ([257942b](https://github.com/fast-crud/fast-crud/commit/257942b3167b07885ae5621993db9f241f9816ae))
+
+### Performance Improvements
+
+* @iconify/vue不再打包进lib中，需要外部引入 ([d8166be](https://github.com/fast-crud/fast-crud/commit/d8166be37d78d50e27e43143829a73a2253f6aad))
+* 点击查询按钮将触发on_search和onSearch事件。其中on_search为默认的查询操作 ([0f452a4](https://github.com/fast-crud/fast-crud/commit/0f452a40b845e84744229e065ec5c1dcfb4ea6b9))
+
+# [1.20.0](https://github.com/fast-crud/fast-crud/compare/v1.19.3...v1.20.0) (2024-01-28)
+
+### Bug Fixes
+
+* 删除多余的valueBuilder ([8de6c42](https://github.com/fast-crud/fast-crud/commit/8de6c4239a7a6b0cc6c7daa6fbd8b3c7499cab5f))
+* 行编辑模式下，添加记录，点取消改为删除效果 ([3d08399](https://github.com/fast-crud/fast-crud/commit/3d08399a96699eb6a3a46faae5c063e98350aa94))
+* 修复裁剪图片没有名称的bug ([05d0180](https://github.com/fast-crud/fast-crud/commit/05d01802f6b6ca0e07329bfa9c1d4260ebf861b6))
+* 修复查询valueChange 修改form无效的bug ([054f8b4](https://github.com/fast-crud/fast-crud/commit/054f8b4b808a52f6d8daf2d19ee3adf43f693c0a))
+* 修复未mounted之前立即search报错的bug ([51bd7c6](https://github.com/fast-crud/fast-crud/commit/51bd7c618adad970a80933c127aa6489d5af6e83))
+* 修复行编辑模式下，校验错误内容赋值错误的问题 ([62861e9](https://github.com/fast-crud/fast-crud/commit/62861e9560ddbca21a748f37474365bc1aafd53a))
+* 修复antdv rowhandle 更多按钮错位问题 ([fbeef05](https://github.com/fast-crud/fast-crud/commit/fbeef05bc8a743c86fbf300dc57bad40d17e62e7))
+* 修复card布局，actionbar slot错位问题 ([b653d1c](https://github.com/fast-crud/fast-crud/commit/b653d1c8470feef52eae22b3cc03c9e0a7b48669))
+
+### Features
+
+* 行记录支持类型定义 ([ed9d49e](https://github.com/fast-crud/fast-crud/commit/ed9d49e9eca34553c92a11a795a8e5ccf4c8ab88))
+* iconify已经内置，无需额外配置，直接使用即可 ([4991fd9](https://github.com/fast-crud/fast-crud/commit/4991fd946e4928f7d058472814d5a28f089cb4a2))
+
+### Performance Improvements
+
+* 国际化默认配置为computed值 ([fb9a59c](https://github.com/fast-crud/fast-crud/commit/fb9a59cfc4a67e0eb3fdb2327abac9f2226ba9c8))
+* 行编辑也支持排他式激活 ([51e37bd](https://github.com/fast-crud/fast-crud/commit/51e37bdce2f20141d995ccaeeaa710b305e591ff))
+* 优化element 日期示例，格式化问题，输入数据格式告警问题，range样式问题 ([66fd07b](https://github.com/fast-crud/fast-crud/commit/66fd07b96143b77ed73b5e3b88182070ebdb4c80))
+* 优化form.wrapper.buttons的默认配置 ([61f2ae5](https://github.com/fast-crud/fast-crud/commit/61f2ae5600814a59e2eaad8933892c1ec9f57c69))
+* 优化free模式，支持默认不激活 ([aeaf0a6](https://github.com/fast-crud/fast-crud/commit/aeaf0a683ecc24dcb86036daea363f3019347299))
+* 优化table-select的getNodesByValues的异常提示 ([83ad808](https://github.com/fast-crud/fast-crud/commit/83ad8082040cf738929a4db6da4ab68ef16f454f))
+* 增加afterRemove判定，delRequest返回false则不执行后面的逻辑 ([448b2d8](https://github.com/fast-crud/fast-crud/commit/448b2d8a3bb30d496e88360f66353a402dd7dfc9))
+* dict-select增加onSelectedChange事件，可以获取option ([84298c1](https://github.com/fast-crud/fast-crud/commit/84298c1ee3042cac38a33d4638176e553c3d4b30))
+* dict-tree组件无需手动配置labelName keyName ([c8b0ee1](https://github.com/fast-crud/fast-crud/commit/c8b0ee1ee5fa22e73b3a8ef77e1ad3335351dc70))
+* first 增加 tour示例 ([b1ae0aa](https://github.com/fast-crud/fast-crud/commit/b1ae0aa2c901b38ca61151c4eba6e238b55fa0f0))
+* first示例增加行数据模型 ([1010528](https://github.com/fast-crud/fast-crud/commit/10105288594e2becd3c086fea1af0ff2156b277d))
+* table-select支持隐藏选中label ([04791d5](https://github.com/fast-crud/fast-crud/commit/04791d54eb5cae852f345207b90f75f85fad4eda))
+
 ## [1.19.3](https://github.com/fast-crud/fast-crud/compare/v1.19.2...v1.19.3) (2023-12-15)
 
 ### Bug Fixes

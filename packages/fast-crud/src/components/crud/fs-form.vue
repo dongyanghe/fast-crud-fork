@@ -542,8 +542,12 @@ export default defineComponent({
 
       //移除不允许提交的字段
       _.each(props.columns, (item, key) => {
+        debugger;
         if (item.submit === false) {
           _.unset(formData, key);
+        } else if (item.submit === true) {
+          //设置强制提交的字段
+          _.set(formData, key, formData[key]);
         }
       });
 
@@ -690,6 +694,10 @@ export default defineComponent({
     }
     .el-date-editor .el-range__close-icon {
       margin-right: 10px;
+    }
+
+    .el-range-editor.el-input__wrapper {
+      padding: 0;
     }
   }
 

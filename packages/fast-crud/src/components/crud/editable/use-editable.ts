@@ -618,6 +618,16 @@ export function useEditable(props: any, ctx: any, tableRef: any): { editable: Ed
     return editableRows[editableId];
   }
 
+  function getActiveRows() {
+    const rows: any[] = [];
+    editableEachRows(({ row }) => {
+      if (row.isEditing) {
+        rows.push(row);
+      }
+    });
+    return rows;
+  }
+
   async function validate() {
     const errors: any = {};
     let hasError = false;
@@ -625,7 +635,7 @@ export function useEditable(props: any, ctx: any, tableRef: any): { editable: Ed
       const row = editableRows[key];
       const res = await row.validate();
       if (res != true) {
-        errors[row.editableId] = errors;
+        errors[row.editableId] = res;
         hasError = true;
       }
     }
@@ -673,7 +683,8 @@ export function useEditable(props: any, ctx: any, tableRef: any): { editable: Ed
       eachRows: editableEachRows,
       eachCells: editableEachCells,
       validate,
-      getCleanTableData
+      getCleanTableData,
+      getActiveRows
     }
   };
 }

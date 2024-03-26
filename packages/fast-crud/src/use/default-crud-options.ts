@@ -1,11 +1,18 @@
 import { uiContext } from "../ui";
-import { CrudOptions, UseCrudProps } from "../d";
-export default {
-  commonOptions(ctx?: UseCrudProps): any {
+import { DynamicallyCrudOptions, UseCrudProps } from "../d";
+import { computed } from "vue";
+
+const defaultCrudOptions = {
+  commonOptions(ctx?: UseCrudProps<any, any>): any {
     return {};
   },
-  defaultOptions(opts: { t: any }): CrudOptions {
+  defaultOptions(opts: { t: any }): DynamicallyCrudOptions<any> {
     const { t } = opts;
+    const ct = (name: string) => {
+      return computed(() => {
+        return t(name);
+      });
+    };
     const ui = uiContext.get();
     return {
       mode: {},
@@ -32,9 +39,15 @@ export default {
         show: true,
         buttons: {
           search: {
+            className: {
+              "fs-search-btn-search": true
+            },
             icon: ui.icons.search
           },
           reset: {
+            className: {
+              "fs-search-btn-reset": true
+            },
             icon: ui.icons.refresh
           }
         }
@@ -59,27 +72,51 @@ export default {
           ...ui.formWrapper.buildInitBind(ui.dialog.name),
           draggable: true,
           destroyOnClose: true, // antdv
-          ...ui.dialog.footer() // antdv
+          ...ui.dialog.footer(), // antdv
+          buttons: {
+            cancel: {
+              text: ct("fs.form.cancel"),
+              order: 1,
+              click: ({ close }) => {
+                close();
+              }
+            },
+            reset: {
+              text: ct("fs.form.reset"),
+              order: 1,
+              click: ({ reset }) => {
+                reset();
+              }
+            },
+            ok: {
+              text: ct("fs.form.ok"),
+              order: 1,
+              type: "primary",
+              click: async ({ submit }) => {
+                await submit();
+              }
+            }
+          }
         }
       },
       addForm: {
         wrapper: {
-          title: t("fs.addForm.title")
+          title: ct("fs.addForm.title")
         }
       },
       editForm: {
         wrapper: {
-          title: t("fs.editForm.title")
+          title: ct("fs.editForm.title")
         }
       },
       viewForm: {
         wrapper: {
-          title: t("fs.viewForm.title")
+          title: ct("fs.viewForm.title")
         }
       },
       rowHandle: {
         width: "250px",
-        title: t("fs.rowHandle.title"),
+        title: ct("fs.rowHandle.title"),
         order: 1000,
         dropdown: {
           // 操作列折叠
@@ -114,16 +151,48 @@ export default {
         pagination: false //antdv 关闭默认分页
       },
       toolbar: {
-        compact: true
+        compact: true,
+        buttons: {
+          search: {
+            className: {
+              "fs-toolbar-btn-search": true
+            }
+          },
+          compact: {
+            className: {
+              "fs-toolbar-btn-compact": true
+            }
+          },
+          refresh: {
+            className: {
+              "fs-toolbar-btn-refresh": true
+            }
+          },
+          export: {
+            className: {
+              "fs-toolbar-btn-export": true
+            }
+          },
+          columns: {
+            className: {
+              "fs-toolbar-btn-columns": true
+            }
+          }
+        }
       },
       actionbar: {
         buttons: {
           add: {
+            className: {
+              "fs-actionbar-btn-add": true
+            },
             type: "primary",
-            text: t("fs.actionbar.add")
+            text: ct("fs.actionbar.add")
           }
         }
       }
     };
   }
 };
+
+export default defaultCrudOptions;

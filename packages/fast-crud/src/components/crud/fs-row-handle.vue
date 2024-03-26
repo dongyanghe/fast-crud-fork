@@ -138,6 +138,11 @@ export default defineComponent({
             text: t("fs.rowHandle.view.text"),
             title: t("fs.rowHandle.view.text")
           },
+          copy: {
+            key: "copy",
+            text: t("fs.rowHandle.copy.text"),
+            title: t("fs.rowHandle.copy.text")
+          },
           edit: {
             key: "edit",
             type: "primary",
@@ -253,13 +258,15 @@ export default defineComponent({
 .fs-row-handle {
   // display: flex ; // 这里不能用flex，否则会破坏align:center配置
   flex-wrap: wrap;
+  display: inline-flex;
+  align-items: center;
   .el-button + .el-button {
     margin-left: 2px;
   }
   & > * {
     margin: 2px;
     display: inline-flex;
-    align-items: baseline;
+    align-items: center;
   }
   .fs-row-handle-dropdown-item {
     display: flex;

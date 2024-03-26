@@ -301,7 +301,7 @@ export default defineComponent({
     }
 
     function getContextFn(): SearchEventContext {
-      return { form, validatedForm: form, getComponentRef };
+      return { form, validatedForm: form, getComponentRef, doValidate: null };
     }
 
     const searchEventContextRef: Ref<SearchEventContext> = ref(getContextFn());
@@ -444,7 +444,8 @@ export default defineComponent({
         const value = form[key];
         const componentRef = getComponentRef(key);
         const valueChange = item.valueChange instanceof Function ? item.valueChange : item.valueChange.handle;
-        valueChange({ key, value, componentRef, ...getContextFn() });
+        //@ts-ignore
+        valueChange({ key, value, componentRef, ...getContextFn(), immidiate: false });
       }
       if (item.autoSearchTrigger == null || item.autoSearchTrigger === true || item.autoSearchTrigger === "change") {
         doAutoSearch();

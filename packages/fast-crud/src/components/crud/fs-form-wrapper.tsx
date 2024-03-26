@@ -7,6 +7,8 @@ import {
   Ref,
   ref,
   resolveDynamicComponent,
+  toRaw,
+  unref,
   useSlots
 } from "vue";
 import _ from "lodash-es";
@@ -91,9 +93,12 @@ export default defineComponent({
         formOptionsRef: formOptions,
         setFormData,
         getFormData,
+        reset,
+        loading,
         close,
         toggleFullscreen,
-        submit
+        submit,
+        mode: formOptions.value.mode
       };
     }
 
@@ -103,7 +108,7 @@ export default defineComponent({
       if (wrapper.onOpen) {
         wrapper.onOpen(opts);
       }
-      title.value = wrapper.title;
+      title.value = unref(wrapper.title);
       formWrapperIs.value = opts.wrapper.is;
       formWrapperOpts.value = wrapper;
       const customClassKey = ui.formWrapper.customClass(formWrapperIs.value as string);
@@ -213,24 +218,9 @@ export default defineComponent({
 
     const computedButtons = computed(() => {
       const defBtns = {
-        cancel: {
-          text: t("fs.form.cancel"),
-          onClick: () => {
-            close();
-          }
-        },
-        reset: {
-          text: t("fs.form.reset"),
-          onClick: () => {
-            reset();
-          }
-        },
+        cancel: {},
+        reset: {},
         ok: {
-          text: t("fs.form.ok"),
-          type: "primary",
-          onClick: async () => {
-            await submit();
-          },
           loading: loading.value
         }
       };
@@ -250,9 +240,9 @@ export default defineComponent({
       });
     });
 
-    onMounted(() => {
+    onMounted(async () => {
       if (props.options != null) {
-        open(props.options);
+        await open(props.options);
       }
       ctx.emit("mounted", getCurrentInstance().exposed);
     });
@@ -296,6 +286,7 @@ export default defineComponent({
       formWrapperBind,
       formRef,
       submit,
+      reset,
       computedButtons,
       loading,
       getFormData,

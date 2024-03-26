@@ -35,6 +35,7 @@
       :upload-tip="uploadTip"
       :max-size="maxSize"
       :cropper="cropper"
+      :compress-quality="compressQuality"
       output="all"
       @done="cropComplete"
       @ready="doReady"
@@ -111,6 +112,13 @@ export default defineComponent({
     uploader: {
       type: Object
     },
+    /**
+     * 压缩质量
+     */
+    compressQuality: {
+      type: Number,
+      default: 0.8
+    },
     // 构建下载url方法,不影响提交的value
     buildUrl: {
       type: Function,
@@ -138,6 +146,7 @@ export default defineComponent({
     const formValidator = ui.formItem.injectFormItemContext();
     // eslint-disable-next-line vue/no-setup-props-destructure
     let emitValue: any = props.modelValue;
+    // eslint-disable-next-line vue/no-setup-props-destructure
     initValue(props.modelValue);
 
     async function initValue(value: any) {
@@ -182,6 +191,9 @@ export default defineComponent({
       const blob = ret.blob;
       const dataUrl = ret.dataUrl;
       const file = ret.file;
+      const filename = file.name;
+      const blobFile = new File([blob], filename, { type: blob.type });
+
       // 开始上传
       const item: any = reactive({
         url: undefined,
@@ -198,10 +210,10 @@ export default defineComponent({
         console.error(e);
       };
       const option = {
-        file: blob,
-        fileName: file.name,
+        file: blobFile,
         onProgress,
-        onError
+        onError,
+        fileName: filename
       };
       listRef.value.push(item);
       try {

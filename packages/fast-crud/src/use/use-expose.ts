@@ -11,10 +11,12 @@ import {
   DoRemoveContext,
   EditableEachCellsOpts,
   EditableEachRowsOpts,
+  EditableSaveRowContext,
   Page,
   PageQuery,
   PageRes,
   RemoveProps,
+  RowRecord,
   SearchOptions,
   UserPageQuery,
   UserPageRes
@@ -25,25 +27,25 @@ import { Editable, EditableActiveColsOptions, EditableAddRowOptions } from "../d
 
 const { merge } = useMerge();
 const doMerge = merge;
-export type UseExposeProps = {
+export type UseExposeProps<R = any> = {
   crudRef: Ref;
-  crudBinding: Ref<CrudBinding>;
+  crudBinding: Ref<CrudBinding<R>>;
 };
 
-export type UseExposeRet = {
-  expose: CrudExpose;
-  crudExpose: CrudExpose;
+export type UseExposeRet<R = any> = {
+  expose: CrudExpose<R>;
+  crudExpose: CrudExpose<R>;
 };
 
-export type UseEditableProps = {
-  crudExpose: CrudExpose;
+export type UseEditableProps<R = any> = {
+  crudExpose: CrudExpose<R>;
 };
 
 export type EditableOnEnabledProps = {
   editable: any;
 };
 
-function useEditable(props: UseEditableProps) {
+function useEditable<R = any>(props: UseEditableProps<R>) {
   const { crudExpose } = props;
   const { crudBinding } = crudExpose;
   const { ui } = useUi();
@@ -66,7 +68,7 @@ function useEditable(props: UseEditableProps) {
       }
     }
   );
-  const editable: Editable = {
+  const editable: Editable<R> = {
     /**
      * 启用编辑
      * @param opts
@@ -131,6 +133,9 @@ function useEditable(props: UseEditableProps) {
     getEditableRow(editableId: any) {
       return crudExpose.getTableRef()?.editable?.getEditableRow(editableId);
     },
+    getActiveRows() {
+      return crudExpose.getTableRef()?.editable?.getActiveRows();
+    },
     async doSaveRow(opts: { editableId: any; row: any }) {
       let editableId = opts.editableId;
       if (!editableId) {
@@ -139,7 +144,7 @@ function useEditable(props: UseEditableProps) {
       }
       const editableRow = editable.getEditableRow(editableId);
       await editableRow.save({
-        async doSave(opts: { isAdd: boolean; row: any; setData: (data: any) => void }) {
+        async doSave(opts: EditableSaveRowContext<R>) {
           const { isAdd, row, setData } = opts;
           const rowData = row;
           if (crudBinding.value?.mode?.name === "local") {
@@ -159,34 +164,41 @@ function useEditable(props: UseEditableProps) {
         }
       });
     },
-    async doCancelRow(opts: { editableId: any; row: any }) {
+    async doCancelRow(opts: { editableId: any; row: R }) {
       let editableId = opts.editableId;
       if (!editableId) {
         const row = opts.row;
+        //@ts-ignore
         editableId = row[crudBinding.value.table.editable.rowKey];
       }
 
       const editableRow = editable.getEditableRow(editableId);
+      if (editableRow.isAdd) {
+        editable.removeRow(editableId);
+        return;
+      }
       editableRow.cancel();
     },
-    async doRemoveRow(opts: { editableId: any; row: any }) {
+    async doRemoveRow(opts: { editableId: any; row: R }) {
       let editableId = opts.editableId;
       if (!editableId) {
         const row = opts.row;
+        //@ts-ignore
         editableId = row[crudBinding.value.table.editable.rowKey];
       }
 
       const editableRow = editable.getEditableRow(editableId);
-      const rowData = editableRow.rowData;
-      await crudExpose.doRemove(opts, {
+      return await crudExpose.doRemove(opts, {
         async handle() {
           if (editableRow.isAdd) {
             editable.removeRow(editableId);
+            return false;
           } else {
             if (crudBinding.value.mode.name === "local") {
               editable.removeRow(editableId);
+              return { isLocal: true };
             } else {
-              await crudBinding.value.request.delRequest({ row: rowData });
+              return await crudBinding.value.request.delRequest(opts);
             }
           }
         }
@@ -195,10 +207,10 @@ function useEditable(props: UseEditableProps) {
     getInstance() {
       crudExpose.getTableRef().editable;
     },
-    eachCells(callback: (opts: EditableEachCellsOpts) => void) {
+    eachCells(callback: (opts: EditableEachCellsOpts<R>) => void) {
       crudExpose.getTableRef().editable?.eachCells(callback);
     },
-    eachRows(callback: (opts: EditableEachRowsOpts) => void) {
+    eachRows(callback: (opts: EditableEachRowsOpts<R>) => void) {
       crudExpose.getTableRef().editable?.eachRows(callback);
     },
     async validate() {
@@ -218,7 +230,7 @@ function useEditable(props: UseEditableProps) {
  *
  * @param props
  */
-export function useExpose(props: UseExposeProps): UseExposeRet {
+export function useExpose<R = any>(props: UseExposeProps<R>): UseExposeRet<R> {
   const { crudRef, crudBinding } = props;
   const { ui } = useUi();
   const { t } = useI18n();
@@ -235,7 +247,7 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
     }
   }
 
-  const crudExpose: CrudExpose = {
+  const crudExpose: CrudExpose<R> = {
     crudRef,
     crudBinding,
 
@@ -268,7 +280,7 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
         columns = toRaw(crudBinding.value.columns);
       }
       logger.debug("doValueBuilder ,columns=", columns);
-      const valueBuilderColumns: ColumnCompositionProps[] = [];
+      const valueBuilderColumns: ColumnCompositionProps<R>[] = [];
       forEachColumns(columns, (column) => {
         if (column.valueBuilder != null) {
           valueBuilderColumns.push(column);
@@ -282,6 +294,7 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
           col.valueBuilder({
             value: row[col.key],
             row,
+            form: row,
             index,
             key: col.key,
             column: col
@@ -289,7 +302,9 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
         });
 
         //children
+        //@ts-ignore
         if (row.children && isArray(row.children)) {
+          //@ts-ignore
           crudExpose.doValueBuilder(row.children, columns);
         }
       });
@@ -299,7 +314,7 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
       if (columns == null) {
         columns = toRaw(crudBinding.value.columns);
       }
-      const valueBuilderColumns: ColumnCompositionProps[] = [];
+      const valueBuilderColumns: ColumnCompositionProps<R>[] = [];
       forEachColumns(columns, (column) => {
         if (column.valueResolve != null) {
           valueBuilderColumns.push(column);
@@ -334,6 +349,13 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
      * {form,mergeForm}
      */
     setSearchFormData(context) {
+      if (crudRef.value) {
+        crudRef.value.setSearchFormData({
+          form: context.form,
+          mergeForm: context.mergeForm
+        });
+      }
+
       if (context.mergeForm === false) {
         for (const key in crudBinding.value.search.validatedForm) {
           delete crudBinding.value.search.validatedForm[key];
@@ -353,7 +375,7 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
       return crudRef.value?.getSearchRef();
     },
 
-    buildPageQuery(pageQuery: PageQuery): UserPageQuery {
+    buildPageQuery(pageQuery: PageQuery<R>): UserPageQuery<R> {
       const page = pageQuery.page;
 
       let searchFormData = pageQuery.form;
@@ -370,17 +392,17 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
         sort = crudBinding.value.table.sort || {};
       }
 
-      const query: PageQuery = { page, form: searchFormData, sort };
-      let userPageQuery: UserPageQuery = query;
+      const query: PageQuery<R> = { page, form: searchFormData, sort };
+      let userPageQuery: UserPageQuery<R> = query;
       if (crudBinding.value.request.transformQuery) {
         userPageQuery = crudBinding.value.request.transformQuery(query);
       }
       return userPageQuery;
     },
 
-    async search(pageQuery: PageQuery, options: SearchOptions = {}) {
+    async search(pageQuery: PageQuery<R>, options: SearchOptions = {}) {
       const userPageQuery = crudExpose.buildPageQuery(pageQuery);
-      let userPageRes: UserPageRes;
+      let userPageRes: UserPageRes<R>;
       try {
         if (options.silence !== true) {
           crudBinding.value.table.loading = true;
@@ -397,7 +419,7 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
         logger.warn("pageRequest返回结果不能为空");
         return;
       }
-      let pageRes: PageRes = userPageRes as PageRes;
+      let pageRes: PageRes<R> = userPageRes as PageRes<R>;
       if (crudBinding.value.request.transformRes) {
         pageRes = crudBinding.value.request.transformRes({
           res: userPageRes,
@@ -526,8 +548,12 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
         crudExpose.doPageTurn(1);
       }
       if (opts.form && crudRef.value) {
-        crudRef.value.setSearchFormData(opts);
-        crudExpose.setSearchFormData({ form: opts.form, mergeForm: opts.mergeForm, refWarning: false });
+        crudExpose.setSearchFormData({
+          form: opts.form,
+          mergeForm: opts.mergeForm,
+          refWarning: false,
+          triggerSearch: false
+        });
       }
 
       await crudExpose.doRefresh();
@@ -618,7 +644,7 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
      * @param context
      * @param opts
      */
-    async doRemove(context: DoRemoveContext, opts?: RemoveProps) {
+    async doRemove(context: DoRemoveContext<R>, opts?: RemoveProps<R>) {
       const removeBinding: any = crudBinding.value.table.remove ?? opts ?? {};
       try {
         if (removeBinding.confirmFn) {
@@ -639,12 +665,22 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
       let res = null;
       const isLocal = crudBinding.value.mode?.name === "local";
       if (opts?.handle) {
-        await opts.handle(context);
+        res = await opts.handle(context);
       } else {
         if (isLocal) {
           crudExpose.removeTableRow(context?.index);
         } else {
           res = await crudBinding.value.request.delRequest(context);
+        }
+      }
+      if (res === false) {
+        return;
+      }
+      const removeScope = { ...context, res };
+      if (removeBinding.afterRemove) {
+        const success = await removeBinding.afterRemove(removeScope);
+        if (success === false) {
+          return false;
         }
       }
 
@@ -702,6 +738,9 @@ export function useExpose(props: UseExposeProps): UseExposeRet {
     },
     async openView(context: OpenEditContext, formOpts: OpenDialogProps = {}) {
       return this._openDialog("view", context, formOpts);
+    },
+    async openCopy(context: OpenEditContext, formOpts: OpenDialogProps = {}) {
+      return this._openDialog("add", context, formOpts);
     },
 
     editable: undefined

@@ -5,6 +5,7 @@
         :is="ui.form.name"
         ref="searchFormRef"
         :model="formData"
+        onsubmit="event.preventDefault();"
         v-bind="options"
         :rules="computedRules"
         class="fs-search-form"
@@ -47,7 +48,14 @@ import { useI18n } from "../../locale";
 import logger from "../../utils/util.log";
 import FsSearchButtons from "./buttons.vue";
 import { Constants } from "../../utils/util.constants";
-import { ButtonsProps, SearchEventContext, SearchItemProps, TypeMap } from "../../d";
+import {
+  ButtonsProps,
+  SearchEventContext,
+  SearchItemProps,
+  TypeMap,
+  ValueChangeContext,
+  ValueChangeHandle
+} from "../../d";
 import { useUi } from "../../use/use-ui";
 import { useMerge } from "../../use/use-merge";
 
@@ -273,8 +281,8 @@ export default defineComponent({
     );
 
     function onFormValidated() {
-      const validateForm = _.cloneDeep(formData);
-      ctx.emit("update:validatedForm", validateForm);
+      const validatedForm = _.cloneDeep(formData);
+      ctx.emit("update:validatedForm", validatedForm);
     }
 
     watch(
@@ -291,8 +299,6 @@ export default defineComponent({
         deep: true
       }
     );
-
-
 
     const get = (form: any, key: any) => {
       return _.get(form, key);
@@ -390,7 +396,7 @@ export default defineComponent({
     }
 
     function getContextFn(): SearchEventContext {
-      return { form: formData, validatedForm: props.validatedForm, getComponentRef };
+      return { form: formData, validatedForm: props.validatedForm, getComponentRef, doSearch, doReset, doValidate };
     }
 
     function buildFieldContext(key: string) {
@@ -421,6 +427,7 @@ export default defineComponent({
       if (await doValidate()) {
         onFormValidated();
         await nextTick();
+        ctx.emit("_search", getContextFn());
         ctx.emit("search", getContextFn());
       }
     }
@@ -553,18 +560,35 @@ export default defineComponent({
       _.set(formData, key, value);
 
       const silent = props.validateOnChangeSilent;
-      if (props.validateOnChange && (await doValidate(silent, "change"))) {
-        onFormValidated();
-      }
+      // if (props.validateOnChange && (await doValidate(silent, "change"))) {
+      //   onFormValidated();
+      // }
 
       if (item.valueChange) {
         const key = item.key;
         const value = formData[key];
         const componentRef = getComponentRef(key);
-        const valueChange = item.valueChange instanceof Function ? item.valueChange : item.valueChange.handle;
-        valueChange({ key, value, componentRef, ...getContextFn() });
+        const valueChange: ValueChangeHandle =
+          item.valueChange instanceof Function ? item.valueChange : item.valueChange.handle;
+        const scope = getContextFn();
+        const valueChangeContext: ValueChangeContext = {
+          index: 0,
+          row: scope.form,
+          form: scope.form,
+          ...scope,
+          key,
+          value,
+          componentRef,
+          immediate: false,
+          getComponentRef,
+          mode: "search"
+        };
+        valueChange(valueChangeContext);
       }
-
+      // TODO 由于validatedForm 发射出去后，会更新formData的数据，所以要放在valueChange后面,不然会死循环
+      if (props.validateOnChange && (await doValidate(silent, "change"))) {
+        onFormValidated();
+      }
       if (item.autoSearchTrigger == null || item.autoSearchTrigger === true || item.autoSearchTrigger === "change") {
         doAutoSearch();
       }
@@ -627,10 +651,15 @@ export default defineComponent({
       flex-wrap: wrap;
 
       .ant-picker,
+      .ant-select,
       .n-date-picker,
       .el-select,
       .el-date-editor {
         width: 100%;
+      }
+
+      .el-range-editor.el-input__wrapper {
+        padding: 0;
       }
 
       .ant-btn-loading-icon {
